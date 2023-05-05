@@ -4,17 +4,17 @@
 #include "../Public/MainCatCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Paper2D/Classes/PaperFlipbookComponent.h"
 
 AMainCatCharacter::AMainCatCharacter()
 {
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
@@ -33,6 +33,7 @@ AMainCatCharacter::AMainCatCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->FieldOfView = 55.f;
+	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->PostProcessBlendWeight = 1.0f;
 	CameraComponent->PostProcessSettings.bOverride_DepthOfFieldFstop = true;
 	CameraComponent->PostProcessSettings.DepthOfFieldFstop = 0.5f;
@@ -86,6 +87,84 @@ void AMainCatCharacter::Turn(float AxisValue)
 void AMainCatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LoadFlipbooks();
+}
+
+void AMainCatCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	AlignCharacterToCamera();
+}
+
+void AMainCatCharacter::LoadFlipbooks()
+{
+	for (int i = 0; i < MaxBodyShapes; i++)
+	{
+		for (int j = 0; j < MaxTextures; j++)
+		{
+			LoadCatAnimationFlipbooks(i, j);
+		}
+	}
+
+	for (int i = 0; i < MaxAccessories; i++)
+	{
+		LoadCatAccessoryFlipbooks(i);
+	}
+}
+
+void AMainCatCharacter::AlignCharacterToCamera() const
+{
+	// Get Camera Rotation to adjust player sprites to camera 
+	const FRotator CameraRotation = CameraComponent->GetForwardVector().ToOrientationRotator();
+
+	// A Temp Variable to adjust pitch while moving
+	float AdjustYawRotation = -90.0f;
+	if (bIsMoving)
+	{
+		if (CurrentCatFaceDirection == ECatFaceDirection::UpLeft ||
+			CurrentCatFaceDirection == ECatFaceDirection::DownRight)
+		{
+			AdjustYawRotation -= SpriteTiltYaw;
+		}
+		else if (CurrentCatFaceDirection == ECatFaceDirection::DownLeft ||
+			CurrentCatFaceDirection == ECatFaceDirection::UpRight)
+		{
+			AdjustYawRotation += SpriteTiltYaw;
+		}
+	}
+
+	// Set rotation based on camera movement and player movement
+	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
+	GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
+}
+
+// CODE UNSTABLE - DON'T USE
+void AMainCatCharacter::ClampCameraPitch() const
+{
+	const FRotator SpringArmRotation = SpringArmComponent->GetRelativeRotation();
+	//UE_LOG(LogTemp, Warning, TEXT("SpringArmRotation.Pitch: %f"), SpringArmRotation.Pitch);
+	if (SpringArmRotation.Pitch < -CameraPitchMax)
+	{
+		
+		SpringArmComponent->SetRelativeRotation(
+			FRotator(
+				-CameraPitchMax,
+				SpringArmRotation.Yaw,
+				0.0f
+			)
+		);
+	} else if (SpringArmRotation.Pitch > -CameraPitchMin)
+	{
+		
+		SpringArmComponent->SetRelativeRotation(
+			FRotator(
+				-CameraPitchMin,
+				SpringArmRotation.Yaw,
+				0.0f
+			)
+		);
+	}
 }
 
 void AMainCatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -115,7 +194,7 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 	const float RightSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Right) * 100) / 100;
 
 	// Temp Log
-	//UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardSpeed, RightSpeed);
+	// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardSpeed, RightSpeed);
 
 	// Set is moving by checking the character speed
 	bIsMoving = RightSpeed != 0.0f || ForwardSpeed != 0.0f;
@@ -150,12 +229,40 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 		}
 		else if (abs(ForwardSpeed) < 0.5f && RightSpeed > 0.0f)
 		{
-			CurrentCatFaceDirection = ECatFaceDirection::Right;
-		}
-		else
-		{
 			CurrentCatFaceDirection = ECatFaceDirection::Left;
 		}
+		else if (abs(ForwardSpeed) < 0.5f && RightSpeed < 0.0f)
+		{
+			CurrentCatFaceDirection = ECatFaceDirection::Right;
+		}
 	}
+}
+
+void AMainCatCharacter::Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity)
+{
+	//Super::Animate(DeltaTime, OldLocation, OldVelocity);
+	TOptional<FMinimalViewInfo> ViewInfo;
+	// If it is the player in control, take the camera into account and calculate the ViewInfo
+	if (IsPlayerControlled())
+	{
+		if (GetWorld())
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				ACharacter* Character = PlayerController->GetCharacter();
+				if (Character)
+				{
+					Character->CalcCamera(DeltaTime, ViewInfo.Emplace());
+				}
+			}
+		}
+	}
+
+	// Set Direction Based on ViewInfo
+	SetCurrentAnimationDirection(OldVelocity, ViewInfo);
+
+	// Check if Character is moving to play Idle/Walk Animations
+	AssignFlipbooks(OldVelocity);
 }
 

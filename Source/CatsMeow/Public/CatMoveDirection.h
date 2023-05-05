@@ -24,6 +24,7 @@ struct CATSMEOW_API FCatFaceFlipbooks
 {
 	GENERATED_BODY()
 
+	// Idle CatAnimationFlipbooks
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
 	TObjectPtr<UPaperFlipbook> IdleUp {nullptr};
 
@@ -35,21 +36,8 @@ struct CATSMEOW_API FCatFaceFlipbooks
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
 	TObjectPtr<UPaperFlipbook> IdleRight {nullptr};
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> IdleUpLeft {nullptr};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> IdleUpRight {nullptr};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> IdleDownLeft {nullptr};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> IdleDownRight {nullptr};
-
-
-
+	// Walk CatAnimationFlipbooks
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
 	TObjectPtr<UPaperFlipbook> WalkUp {nullptr};
 	
@@ -61,17 +49,5 @@ struct CATSMEOW_API FCatFaceFlipbooks
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
 	TObjectPtr<UPaperFlipbook> WalkRight {nullptr};
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> WalkUpLeft {nullptr};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> WalkUpRight {nullptr};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> WalkDownLeft {nullptr};
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatCharacter|CatSprites")
-	TObjectPtr<UPaperFlipbook> WalkDownRight {nullptr};
 
 };
