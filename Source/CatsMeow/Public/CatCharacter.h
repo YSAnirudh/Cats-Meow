@@ -60,6 +60,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")
 	ECatFaceDirection CurrentCatFaceDirection = ECatFaceDirection::Down;
 
+	// Vector used to adjust the cat's direction when not moving
+	FVector CatRight = FVector();
+	ECatFaceDirection TempCatFaceDirection = ECatFaceDirection::Down;
+
 	// Flipbooks for Storing Animations of 2D Sprites
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")
 	TArray<FCatFaceFlipbooks> CatAnimationFlipbooks;

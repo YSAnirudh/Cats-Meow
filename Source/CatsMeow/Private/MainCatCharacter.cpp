@@ -184,17 +184,20 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 	if (!ViewInfo.IsSet()) return;
 
 	// Calculate forward and Right vector of the character from the ViewInfo
+	// Camera Forward and Right Vectors
 	const FVector Forward = UKismetMathLibrary::GetForwardVector(ViewInfo.GetValue().Rotation);
 	const FVector Right = UKismetMathLibrary::GetRightVector(ViewInfo.GetValue().Rotation);
 
 	// Forward Speed and Right Speed indicate the
 	// amount of similarity between Velocity and
 	// the Forward and Right Vector (Dot Product)
+	// Speed of the cat based on the camera forward and right vectors
 	const float ForwardSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Forward) * 100) / 100;
 	const float RightSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Right) * 100) / 100;
 
 	// Temp Log
 	// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardSpeed, RightSpeed);
+	// UE_LOG(LogTemp, Warning, TEXT("Forward: %f %f, Right: %f %f"), Forward.X, Forward.Y, Right.X, Right.Y);
 
 	// Set is moving by checking the character speed
 	bIsMoving = RightSpeed != 0.0f || ForwardSpeed != 0.0f;
@@ -203,6 +206,7 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 	// Facing Direction is flipped for main Character
 	if (bIsMoving)
 	{
+		CatRight = Right;
 		if (ForwardSpeed > 0.0f && abs(RightSpeed) < 0.25f)
 		{
 			CurrentCatFaceDirection = ECatFaceDirection::Up;
@@ -234,6 +238,109 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 		else if (abs(ForwardSpeed) < 0.5f && RightSpeed < 0.0f)
 		{
 			CurrentCatFaceDirection = ECatFaceDirection::Right;
+		}
+		TempCatFaceDirection = CurrentCatFaceDirection;
+	}
+	// If the cat isn't moving, update Cat Face Direction according to the camera movement. 
+	else {
+		// UE_LOG(LogTemp, Warning, TEXT("Forward: %f %f, Right: %f %f"), CatForward.X, CatForward.Y, CatRight.X, CatRight.Y);
+		const float ForwardDot = FMath::Floor(FVector::DotProduct(Forward, CatRight) * 100) / 100;
+		const float RightDot = FMath::Floor(FVector::DotProduct(Right, CatRight) * 100) / 100;
+		// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardDot, RightDot);
+
+		if (TempCatFaceDirection == ECatFaceDirection::Left ||
+			TempCatFaceDirection == ECatFaceDirection::UpLeft ||
+			TempCatFaceDirection == ECatFaceDirection::DownLeft)
+		{
+			TempCatFaceDirection = ECatFaceDirection::Left;
+		}
+
+		if (TempCatFaceDirection == ECatFaceDirection::Right ||
+				TempCatFaceDirection == ECatFaceDirection::UpRight ||
+				TempCatFaceDirection == ECatFaceDirection::DownRight)
+		{
+			TempCatFaceDirection = ECatFaceDirection::Right;
+		}
+		
+		if (RightDot > 0.75f)
+		{
+			switch(TempCatFaceDirection)
+			{
+			case ECatFaceDirection::Up:
+				CurrentCatFaceDirection = ECatFaceDirection::Up;
+				break;
+			case ECatFaceDirection::Down:
+				CurrentCatFaceDirection = ECatFaceDirection::Down;
+				break;
+			case ECatFaceDirection::Left:
+				CurrentCatFaceDirection = ECatFaceDirection::Left;
+				break;
+			case ECatFaceDirection::Right:
+				CurrentCatFaceDirection = ECatFaceDirection::Right;
+				break;
+			default:;
+			}
+			// Forward - DO NOT CHANGE
+		}
+		else if (abs(RightDot) < 0.75 && ForwardDot < 0.0f)
+		{
+			switch(TempCatFaceDirection)
+			{
+			case ECatFaceDirection::Up:
+				CurrentCatFaceDirection = ECatFaceDirection::Left;
+				break;
+			case ECatFaceDirection::Down:
+				CurrentCatFaceDirection = ECatFaceDirection::Right;
+				break;
+			case ECatFaceDirection::Left:
+				CurrentCatFaceDirection = ECatFaceDirection::Down;
+				break;
+			case ECatFaceDirection::Right:
+				CurrentCatFaceDirection = ECatFaceDirection::Up;
+				break;
+			default:;
+			}
+			// Turning camera to the right
+		}
+		else if (abs(RightDot) < 0.75 && ForwardDot > 0.0f)
+		{
+			switch(TempCatFaceDirection)
+			{
+			case ECatFaceDirection::Up:
+				CurrentCatFaceDirection = ECatFaceDirection::Right;
+				break;
+			case ECatFaceDirection::Down:
+				CurrentCatFaceDirection = ECatFaceDirection::Left;
+				break;
+			case ECatFaceDirection::Left:
+				CurrentCatFaceDirection = ECatFaceDirection::Up;
+				break;
+			case ECatFaceDirection::Right:
+				CurrentCatFaceDirection = ECatFaceDirection::Down;
+				break;
+			default:;
+			}
+			// Turning camera to the left
+		}
+		else if (abs(RightDot) > 0.75)
+		{
+			switch(TempCatFaceDirection)
+			{
+			case ECatFaceDirection::Up:
+				CurrentCatFaceDirection = ECatFaceDirection::Down;
+				break;
+			case ECatFaceDirection::Down:
+				CurrentCatFaceDirection = ECatFaceDirection::Up;
+				break;
+			case ECatFaceDirection::Left:
+				CurrentCatFaceDirection = ECatFaceDirection::Right;
+				break;
+			case ECatFaceDirection::Right:
+				CurrentCatFaceDirection = ECatFaceDirection::Left;
+				break;
+			default:;
+			}
+			// Behind
 		}
 	}
 }
