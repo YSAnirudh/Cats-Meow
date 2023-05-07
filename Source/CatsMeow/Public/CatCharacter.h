@@ -62,6 +62,9 @@ protected:
 
 	// Vector used to adjust the cat's direction when not moving
 	FVector CatRight = FVector();
+	// Rotator to store Temp Camera rotation used to adjust the cat's direction when not moving
+	FRotator TempCatRotation = FRotator();
+	// Temp Face Direction to adjust the cat's direction when not moving
 	ECatFaceDirection TempCatFaceDirection = ECatFaceDirection::Down;
 
 	// Flipbooks for Storing Animations of 2D Sprites

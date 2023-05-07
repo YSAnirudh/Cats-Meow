@@ -44,6 +44,8 @@ AMainCatCharacter::AMainCatCharacter()
 	CameraComponent->PostProcessSettings.bOverride_DepthOfFieldMinFstop = true;
 	CameraComponent->PostProcessSettings.DepthOfFieldMinFstop = 0.0f;
 	CameraComponent->PostProcessSettings.MotionBlurAmount = 0.0f;
+
+	TempCatRotation = CameraComponent->GetForwardVector().ToOrientationRotator();
 }
 
 // Move Forward/Back
@@ -113,11 +115,14 @@ void AMainCatCharacter::LoadFlipbooks()
 	}
 }
 
-void AMainCatCharacter::AlignCharacterToCamera() const
+void AMainCatCharacter::AlignCharacterToCamera()
 {
 	// Get Camera Rotation to adjust player sprites to camera 
 	const FRotator CameraRotation = CameraComponent->GetForwardVector().ToOrientationRotator();
 
+	// Get Sprite rotation
+	const FRotator SpriteRotation = GetSprite()->GetForwardVector().ToOrientationRotator();
+	
 	// A Temp Variable to adjust pitch while moving
 	float AdjustYawRotation = -90.0f;
 	if (bIsMoving)
@@ -132,11 +137,45 @@ void AMainCatCharacter::AlignCharacterToCamera() const
 		{
 			AdjustYawRotation += SpriteTiltYaw;
 		}
+		// Set rotation based on camera movement and player movement
+		GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
+		GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
+
+		TempCatRotation = CameraRotation;
+	}
+	else
+	{
+		const FVector Forward = CameraComponent->GetForwardVector();
+		const FVector Right = CameraComponent->GetRightVector();
+
+		const float ForwardDot = FMath::Floor(FVector::DotProduct(Forward, CatRight) * 100) / 100;
+		const float RightDot = FMath::Floor(FVector::DotProduct(Right, CatRight) * 100) / 100;
+		
+		if (RightDot > 0.75f)
+		{
+			// Forward - DO NOT CHANGE
+			AdjustYawRotation += 0.0f;
+		}
+		else if (abs(RightDot) < 0.75 && ForwardDot < 0.0f)
+		{
+			// Turning camera to the right
+			AdjustYawRotation -= 90.0f;
+		}
+		else if (abs(RightDot) < 0.75 && ForwardDot > 0.0f)
+		{
+			// Turning camera to the left
+			AdjustYawRotation += 90.0f;
+		}
+		else if (abs(RightDot) > 0.75)
+		{
+			// Behind
+			AdjustYawRotation += 180.0f;
+		}
+		
+		GetSprite()->SetWorldRotation(FRotator(0.0f, TempCatRotation.Yaw + AdjustYawRotation, TempCatRotation.Roll));
+		GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, TempCatRotation.Yaw + AdjustYawRotation, TempCatRotation.Roll));
 	}
 
-	// Set rotation based on camera movement and player movement
-	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
-	GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
 }
 
 // CODE UNSTABLE - DON'T USE
@@ -264,6 +303,7 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 		
 		if (RightDot > 0.75f)
 		{
+			// Forward - DO NOT CHANGE
 			switch(TempCatFaceDirection)
 			{
 			case ECatFaceDirection::Up:
@@ -280,10 +320,10 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 				break;
 			default:;
 			}
-			// Forward - DO NOT CHANGE
 		}
 		else if (abs(RightDot) < 0.75 && ForwardDot < 0.0f)
 		{
+			// Turning camera to the right
 			switch(TempCatFaceDirection)
 			{
 			case ECatFaceDirection::Up:
@@ -300,10 +340,10 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 				break;
 			default:;
 			}
-			// Turning camera to the right
 		}
 		else if (abs(RightDot) < 0.75 && ForwardDot > 0.0f)
 		{
+			// Turning camera to the left
 			switch(TempCatFaceDirection)
 			{
 			case ECatFaceDirection::Up:
@@ -320,10 +360,10 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 				break;
 			default:;
 			}
-			// Turning camera to the left
 		}
 		else if (abs(RightDot) > 0.75)
 		{
+			// Behind
 			switch(TempCatFaceDirection)
 			{
 			case ECatFaceDirection::Up:
@@ -340,7 +380,6 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 				break;
 			default:;
 			}
-			// Behind
 		}
 	}
 }

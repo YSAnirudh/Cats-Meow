@@ -48,7 +48,7 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	// Code for aligning character to the camera
-	void AlignCharacterToCamera() const;
+	void AlignCharacterToCamera();
 	
 	// Clamping Camera rotation between CameraPitchMax and CameraPitchMin
 	void ClampCameraPitch() const;
