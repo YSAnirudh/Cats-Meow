@@ -20,7 +20,7 @@ AMainCatCharacter::AMainCatCharacter()
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->SetRelativeRotation(FRotator(-20.0f, 0.f, 0.f));
 	SpringArmComponent->TargetArmLength = 1500.f;
-	//SpringArmComponent->bDoCollisionTest = false;
+	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->bInheritPitch = true;
 	SpringArmComponent->bInheritRoll = false;
 	SpringArmComponent->bInheritYaw = true;
@@ -45,6 +45,9 @@ AMainCatCharacter::AMainCatCharacter()
 	CameraComponent->PostProcessSettings.DepthOfFieldMinFstop = 0.0f;
 	CameraComponent->PostProcessSettings.MotionBlurAmount = 0.0f;
 
+	// Call Animate function when the player moves.
+	OnCharacterMovementUpdated.AddDynamic(this, &AMainCatCharacter::Animate);
+	
 	TempCatRotation = CameraComponent->GetForwardVector().ToOrientationRotator();
 }
 
@@ -89,30 +92,12 @@ void AMainCatCharacter::Turn(float AxisValue)
 void AMainCatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	LoadFlipbooks();
 }
 
 void AMainCatCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	AlignCharacterToCamera();
-}
-
-void AMainCatCharacter::LoadFlipbooks()
-{
-	for (int i = 0; i < MaxBodyShapes; i++)
-	{
-		for (int j = 0; j < MaxTextures; j++)
-		{
-			LoadCatAnimationFlipbooks(i, j);
-		}
-	}
-
-	for (int i = 0; i < MaxAccessories; i++)
-	{
-		LoadCatAccessoryFlipbooks(i);
-	}
 }
 
 void AMainCatCharacter::AlignCharacterToCamera()
@@ -175,7 +160,6 @@ void AMainCatCharacter::AlignCharacterToCamera()
 		GetSprite()->SetWorldRotation(FRotator(0.0f, TempCatRotation.Yaw + AdjustYawRotation, TempCatRotation.Roll));
 		GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, TempCatRotation.Yaw + AdjustYawRotation, TempCatRotation.Roll));
 	}
-
 }
 
 // CODE UNSTABLE - DON'T USE
@@ -221,7 +205,7 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 {
 	// ViewInfo is set, continue
 	if (!ViewInfo.IsSet()) return;
-
+	
 	// Calculate forward and Right vector of the character from the ViewInfo
 	// Camera Forward and Right Vectors
 	const FVector Forward = UKismetMathLibrary::GetForwardVector(ViewInfo.GetValue().Rotation);
@@ -233,10 +217,6 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 	// Speed of the cat based on the camera forward and right vectors
 	const float ForwardSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Forward) * 100) / 100;
 	const float RightSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Right) * 100) / 100;
-
-	// Temp Log
-	// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardSpeed, RightSpeed);
-	// UE_LOG(LogTemp, Warning, TEXT("Forward: %f %f, Right: %f %f"), Forward.X, Forward.Y, Right.X, Right.Y);
 
 	// Set is moving by checking the character speed
 	bIsMoving = RightSpeed != 0.0f || ForwardSpeed != 0.0f;
@@ -282,11 +262,9 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 	}
 	// If the cat isn't moving, update Cat Face Direction according to the camera movement. 
 	else {
-		// UE_LOG(LogTemp, Warning, TEXT("Forward: %f %f, Right: %f %f"), CatForward.X, CatForward.Y, CatRight.X, CatRight.Y);
 		const float ForwardDot = FMath::Floor(FVector::DotProduct(Forward, CatRight) * 100) / 100;
 		const float RightDot = FMath::Floor(FVector::DotProduct(Right, CatRight) * 100) / 100;
-		// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardDot, RightDot);
-
+		
 		if (TempCatFaceDirection == ECatFaceDirection::Left ||
 			TempCatFaceDirection == ECatFaceDirection::UpLeft ||
 			TempCatFaceDirection == ECatFaceDirection::DownLeft)
@@ -386,7 +364,6 @@ void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TO
 
 void AMainCatCharacter::Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity)
 {
-	//Super::Animate(DeltaTime, OldLocation, OldVelocity);
 	TOptional<FMinimalViewInfo> ViewInfo;
 	// If it is the player in control, take the camera into account and calculate the ViewInfo
 	if (IsPlayerControlled())

@@ -26,13 +26,15 @@ public:
 	void LookUp(float AxisValue);
 	UFUNCTION()
 	void Turn(float AxisValue);
+
+	UFUNCTION()
+	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
 	// VARIABLES
 private:
 	// FUNCTIONS
-	void LoadFlipbooks();
 	
 	// VARIABLES
 	// Spring arm and Camera
@@ -48,7 +50,7 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	// Code for aligning character to the camera
-	void AlignCharacterToCamera();
+	virtual void AlignCharacterToCamera() override;
 	
 	// Clamping Camera rotation between CameraPitchMax and CameraPitchMin
 	void ClampCameraPitch() const;
@@ -60,10 +62,6 @@ protected:
 	virtual void Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity) override;
 
 	// VARIABLES
-	// The amount by which the cat sprite tilts
-	// when moving in (UpLeft, UpRight, DownRight, DownLeft)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	float SpriteTiltYaw = 40.f;
 
 	// Pitch clamp for camera.
 	float CameraPitchMax = 50.f;

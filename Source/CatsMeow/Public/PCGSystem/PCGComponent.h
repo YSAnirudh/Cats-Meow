@@ -18,9 +18,12 @@ public:
 	// Sets default values for this component's properties
 	UPCGComponent();
 
+	virtual ~UPCGComponent();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	
+	
 	// VARIABLES
 
 protected:
@@ -32,10 +35,17 @@ protected:
 private:
 	// FUNCTIONS
 	UFUNCTION(BlueprintCallable, Category="PCGSystem|Generation")
-	void GeneratePoints();
+	void GenerateIndices();
+
+	void SpawnActorsAtPoints();
+	int ChooseActorAndDecrementCount();
+	void DestroySpawnedActors();
 
 	UFUNCTION(BlueprintCallable, Category="PCGSystem|Generation")
 	void CreateGrid();
+
+	UFUNCTION(BlueprintCallable, Category="PCGSystem|Generation")
+	FVector LineTraceProjectPoint(const FVector& PointToProject, const FVector& EndVector);
 
 	// VARIABLES
 	// Reference to the PCGVolume
@@ -44,18 +54,18 @@ private:
 	// Array holding object positions
 	TArray<FVector> SpawnPoints;
 	TArray<float> SpawnScale;
-	TArray<bool> SpawnedIndices;
+	TArray<int32> SpawnIndices;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|SpawnSettings", meta = (AllowPrivateAccess="true"))
-	TMap<AActor*, int32> ActorsToSpawn;
+	TMap<TObjectPtr<UClass>, int32> ActorsToSpawn;
+
+	TArray<AActor*> SpawnedActors;
 
 	// Grid Divisions for generating points
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|GridSettings", meta = (AllowPrivateAccess="true"))
 	int32 GridDivisionsX = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|GridSettings", meta = (AllowPrivateAccess="true"))
 	int32 GridDivisionsY = 10;
-
-	float PaddingMax = 0.0f;
 
 	// Padding Between GridCells
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|GridSettings", meta = (AllowPrivateAccess="true",
