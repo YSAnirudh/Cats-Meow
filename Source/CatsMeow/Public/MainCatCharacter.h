@@ -35,6 +35,8 @@ public:
 	// VARIABLES
 private:
 	// FUNCTIONS
+	void LoadPlayerSelectionFromSlot(FString SlotName);
+	void SavePlayerSelectionToSlot(FString SlotName);
 	
 	// VARIABLES
 	// Spring arm and Camera
@@ -43,6 +45,25 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
+
+	// Cat Stats
+	// Hunger
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHungerMax = 5;
+
+	int32 CatHungerCurrent;
+
+	// Happiness
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHappinessMax = 5;
+
+	int32 CatHappinessCurrent;
+
+	// Hygiene
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHygieneMax = 5;
+
+	int32 CatHygieneCurrent;
 	
 protected:
 	// FUNCTIONS

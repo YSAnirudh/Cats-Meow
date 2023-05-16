@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Paper2D/Classes/PaperFlipbookComponent.h"
+#include "Saves/CatSaveGame.h"
 
 AMainCatCharacter::AMainCatCharacter()
 {
@@ -92,12 +93,30 @@ void AMainCatCharacter::Turn(float AxisValue)
 void AMainCatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LoadPlayerSelectionFromSlot(TEXT("CustomToInit"));
+	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
 }
 
 void AMainCatCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	AlignCharacterToCamera();
+}
+
+void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
+{
+	if (UCatSaveGame* GameDataInstance = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0)))
+	{
+		CatBodyShape = GameDataInstance->CatBodyShapeNum;
+		CatTexture = GameDataInstance->CatTextureNum;
+		UE_LOG(LogTemp, Warning, TEXT("Body: %d Texture: %d"), GameDataInstance->CatBodyShapeNum, GameDataInstance->CatTextureNum);
+	}
+}
+
+void AMainCatCharacter::SavePlayerSelectionToSlot(FString SlotName)
+{
+	
 }
 
 void AMainCatCharacter::AlignCharacterToCamera()

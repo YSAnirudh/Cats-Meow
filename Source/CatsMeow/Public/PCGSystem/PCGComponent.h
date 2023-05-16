@@ -6,6 +6,44 @@
 #include "Components/ActorComponent.h"
 #include "PCGComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FSpawnRegionData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SpawnMinIndexRangeX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SpawnMinIndexRangeY;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SpawnMaxIndexRangeX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SpawnMaxIndexRangeY;
+};
+
+USTRUCT(BlueprintType)
+struct FProceduralVolumeSpawnData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UClass> SpawnActorType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FSpawnRegionData> SpawnRegions;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> NoOfActors;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnMinScale;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnMaxScale;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator SpawnMinRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator SpawnMaxRotation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TSet<int32> SpawnIndices;
+};
+
 class APCGVolume;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,9 +60,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	
-	
 	// VARIABLES
+	// Array holding object positions
+	TArray<FVector> SpawnPoints;
 
 protected:
 	// FUNCTIONS
@@ -35,10 +73,9 @@ protected:
 private:
 	// FUNCTIONS
 	UFUNCTION(BlueprintCallable, Category="PCGSystem|Generation")
-	void GenerateIndices();
+	void ProcedurallyGenerateActors(int32 MapIndex);
 
-	void SpawnActorsAtPoints();
-	int ChooseActorAndDecrementCount();
+	void SpawnActorsAtPoints(const FProceduralVolumeSpawnData& ActorData);
 	void DestroySpawnedActors();
 
 	UFUNCTION(BlueprintCallable, Category="PCGSystem|Generation")
@@ -51,15 +88,11 @@ private:
 	// Reference to the PCGVolume
 	TObjectPtr<APCGVolume> ParentVolumeRef = nullptr;
 
-	// Array holding object positions
-	TArray<FVector> SpawnPoints;
-	TArray<float> SpawnScale;
-	TArray<int32> SpawnIndices;
+	TSet<int32> SpawnedIndices;
+	TArray<AActor*> SpawnedActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|SpawnSettings", meta = (AllowPrivateAccess="true"))
-	TMap<TObjectPtr<UClass>, int32> ActorsToSpawn;
-
-	TArray<AActor*> SpawnedActors;
+	TArray<FProceduralVolumeSpawnData> ActorSpawnData;
 
 	// Grid Divisions for generating points
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|GridSettings", meta = (AllowPrivateAccess="true"))
@@ -74,11 +107,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|GridSettings", meta = (AllowPrivateAccess="true",
 		ClampMin = 0.0f, ClampMax = 1.0f, UIMin = 0.0f, UIMax = 1.f))
 	float GridPaddingY = 0.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|SpawnSettings", meta = (AllowPrivateAccess="true"))
-	float ScaleMin = 0.5f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PCGSystem|SpawnSettings", meta = (AllowPrivateAccess="true"))
-	float ScaleMax = 2.0f;
 
 	// Bool to use in functions to define if they run every tick or not
 	bool bEveryTick = false;

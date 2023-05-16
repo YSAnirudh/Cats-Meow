@@ -13,7 +13,6 @@ UPCGComponent::UPCGComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SpawnPoints.Empty();
-	SpawnScale.Empty();
 }
 
 UPCGComponent::~UPCGComponent()
@@ -28,112 +27,88 @@ void UPCGComponent::BeginPlay()
 	Super::BeginPlay();
 	ParentVolumeRef = Cast<APCGVolume>(GetOwner());
 	CreateGrid();
-	GenerateIndices();
-	SpawnActorsAtPoints();
+	ProcedurallyGenerateActors(0);
 }
 
-void UPCGComponent::GenerateIndices()
+void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 {
-	int32 NoOfIndices = 0;
-	for (const auto ActorData: ActorsToSpawn)
+	for (auto ActorData: ActorSpawnData)
 	{
-		NoOfIndices += ActorData.Value;
-	}
-	TSet<int32> Indices = TSet<int32>();
-	for (int i = 0; i < GridDivisionsX * GridDivisionsY; i++)
-	{
-		Indices.Add(i);
-	}
-	for (int i = 0; i < NoOfIndices; i++)
-	{
-		if (Indices.Num() == 0)
+		for (int SpawnRegion = 0; SpawnRegion < ActorData.SpawnRegions.Num(); SpawnRegion++) 
 		{
-			break;
-		}
-		// Generate Logic (FILTER FUNCTIONALITY HERE!!!)
-		const int32 RandomInt = FMath::RandRange(0, Indices.Num()-1);
-		
-		//UE_LOG(LogTemp, Warning, TEXT("%d"), *Indices.begin() + RandomInt);
-		SpawnIndices.Add(Indices.Array()[RandomInt]);
-		Indices.Remove(Indices.Array()[RandomInt]);
-	}
-}
+			TSet<int32> Indices = TSet<int32>();
+			const int32 MinSpawnX = ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeX < 0 ?
+				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeX;
+			const int32 MinSpawnY = ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeY < 0 ?
+				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeY;
+			const int32 MaxSpawnX = ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeX > GridDivisionsX - 1 ?
+				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeX;
+			const int32 MaxSpawnY = ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY > GridDivisionsY - 1 ?
+				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY;
 
-void UPCGComponent::SpawnActorsAtPoints()
-{
-	TArray<TObjectPtr<UClass>> TempActorArray;
-	ActorsToSpawn.GenerateKeyArray(TempActorArray);
-
-	for (int i = 0; i < SpawnIndices.Num(); i++)
-	{
-		const int32 SpawnIndex = ChooseActorAndDecrementCount();
-		//UE_LOG(LogTemp, Warning, TEXT("%d"), SpawnIndex);
-		if (SpawnIndex != -1 && SpawnIndex < TempActorArray.Num())
-		{
-			FActorSpawnParameters SpawnInfo;
-			// float ActorHalfHeight = 0.5f * (TempActorArray[SpawnIndex]->GetComponentsBoundingBox().Max.Z -
-			// 	TempActorArray[SpawnIndex]->GetComponentsBoundingBox().Min.Z);
-			// FVector TempSpawnPoint = FVector(SpawnPoints[i].X, SpawnPoints[i].Y, SpawnPoints[i].Z + 1.0f + ActorHalfHeight);
-			AActor* SpawnedActor = GetWorld()->SpawnActor(
-				TempActorArray[SpawnIndex],
-				&SpawnPoints[SpawnIndices[i]],
-				&FRotator::ZeroRotator,
-				SpawnInfo);
-			SpawnedActor->SetActorEnableCollision(true);
-			SpawnedActors.Add(SpawnedActor);
-		}
-		else
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Out of Bounds"));
-		}
-	}
-}
-
-int32 UPCGComponent::ChooseActorAndDecrementCount()
-{
-	TArray<int32> ActorsIndicesToBeSpawned;
-	int32 IndexOfActor = 0;
-	
-	for (auto const ActorToSpawn : ActorsToSpawn)
-	{
-		if (ActorToSpawn.Value > 0)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("%s: %d"), *ActorToSpawn.Key.Get()->GetName(), ActorToSpawn.Value);
-			ActorsIndicesToBeSpawned.Add(IndexOfActor);
-		}
-		IndexOfActor++;
-	}
-
-	IndexOfActor = 0;
-	
-	// for (int i = 0; i < ActorsIndicesToBeSpawned.Num(); i++) {
-	// 	UE_LOG(LogTemp, Warning, TEXT("%d"), ActorsIndicesToBeSpawned[i]);
-	// }
-	// UE_LOG(LogTemp, Warning, TEXT("------"));
-	
-	if (ActorsIndicesToBeSpawned.Num() != 0)
-	{
-		const int32 RandomIndex = FMath::RandRange(0, ActorsIndicesToBeSpawned.Num()-1);
-		for (auto const ActorCount : ActorsToSpawn)
-		{
-			if (ActorsIndicesToBeSpawned[RandomIndex] == IndexOfActor)
+			for (int i = MinSpawnX; i <= MaxSpawnX; i++)
 			{
-				ActorsToSpawn[ActorCount.Key]--;
-				return ActorsIndicesToBeSpawned[RandomIndex];
+				for (int j = MinSpawnY; j <= MaxSpawnY; j++)
+				{
+					const int32 TempIndex = i * GridDivisionsX + j;
+					if (!SpawnedIndices.Contains(TempIndex))
+					{
+						Indices.Add(TempIndex);
+					}
+				}
 			}
-			IndexOfActor++;
+			for (int i = 0; i < ActorData.NoOfActors[SpawnRegion]; i++)
+			{
+				if (Indices.Num() == 0)
+				{
+					break;
+				}
+				
+				const int32 SpawnInd = Indices.Array()[FMath::RandRange(0, Indices.Num()-1)];
+
+				// UE_LOG(LogTemp, Warning, TEXT("Actor: %s | ActorNo: %d | Position: %d"),
+				// 	*ActorData.SpawnActorType->GetName(), i, SpawnInd);
+
+				ActorData.SpawnIndices.Add(SpawnInd);
+				SpawnedIndices.Add(SpawnInd);
+				Indices.Remove(SpawnInd);
+			}
 		}
-		return -1;
+		SpawnActorsAtPoints(ActorData);
 	}
-	return -1;
+	
+}
+
+void UPCGComponent::SpawnActorsAtPoints(const FProceduralVolumeSpawnData& ActorData)
+{
+	for (int i = 0; i < ActorData.SpawnIndices.Num(); i++)
+	{
+		FActorSpawnParameters SpawnInfo;
+
+		const FRotator SpawnRotation = FRotator(
+			0.0f,
+			FMath::FRandRange(ActorData.SpawnMinRotation.Yaw, ActorData.SpawnMaxRotation.Yaw),
+			0.0f
+		);
+
+		const float SpawnScale = FMath::FRandRange(ActorData.SpawnMinScale, ActorData.SpawnMaxScale);
+		
+		FTransform SpawnActorTransform = FTransform(
+			SpawnRotation,
+			SpawnPoints[ActorData.SpawnIndices.Array()[i]],
+			FVector(SpawnScale)
+		);
+		AActor* SpawnedActor = GetWorld()->SpawnActor(
+			ActorData.SpawnActorType,
+			&SpawnActorTransform,
+			SpawnInfo);
+		SpawnedActor->SetActorEnableCollision(true);
+		SpawnedActors.Add(SpawnedActor);
+	}
 }
 
 void UPCGComponent::DestroySpawnedActors()
 {
-	// for(AActor* SpawnedActor : SpawnedActors)
-	// {
-	// 	SpawnedActor->Destroy();
-	// }
 	SpawnedActors.Empty();
 }
 
@@ -142,17 +117,9 @@ void UPCGComponent::CreateGrid()
 	bEveryTick = false;
 	if (ParentVolumeRef)
 	{
-		FVector VolumeBoundsMin = ParentVolumeRef->GetComponentsBoundingBox().Min;
-		FVector VolumeBoundsMax = ParentVolumeRef->GetComponentsBoundingBox().Max;
-		FVector VolumeBoundsExtent = ParentVolumeRef->GetComponentsBoundingBox().GetExtent();
-
-		if (bDebugRun)
-		{
-			// DrawDebugBox(
-			// 	GetWorld(),
-			// 	ParentVolumeRef->GetActorLocation(), ParentVolumeRef->GetComponentsBoundingBox().GetExtent(),
-			// 	FColor::Red, !bEveryTick, -1, 0, 3);
-		}
+		const FVector VolumeBoundsMin = ParentVolumeRef->GetComponentsBoundingBox().Min;
+		const FVector VolumeBoundsMax = ParentVolumeRef->GetComponentsBoundingBox().Max;
+		const FVector VolumeBoundsExtent = ParentVolumeRef->GetComponentsBoundingBox().GetExtent();
 
 		const float GridSizeX = VolumeBoundsExtent.X * 2.0f / GridDivisionsX;
 		const float GridSizeY = VolumeBoundsExtent.Y * 2.0f / GridDivisionsY;
@@ -165,8 +132,8 @@ void UPCGComponent::CreateGrid()
 				const float YPos = VolumeBoundsMin.Y + (GridSizeY * j) + GridSizeY / 2;
 				const float XExtent = GridSizeX / 2 - (GridPaddingX * GridSizeX / 2);
 				const float YExtent = GridSizeY / 2 - (GridPaddingY * GridSizeY / 2);
-				float XRandPos = FMath::RandRange(XPos - XExtent, XPos + XExtent);
-				float YRandPos = FMath::RandRange(YPos - YExtent, YPos + YExtent);
+				const float XRandPos = FMath::RandRange(XPos - XExtent, XPos + XExtent);
+				const float YRandPos = FMath::RandRange(YPos - YExtent, YPos + YExtent);
 
 				FVector SpawnPoint = LineTraceProjectPoint(
 					FVector(XRandPos, YRandPos, VolumeBoundsMax.Z),
