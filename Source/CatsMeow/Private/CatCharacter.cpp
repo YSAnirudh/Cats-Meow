@@ -3,6 +3,9 @@
 
 #include "CatCharacter.h"
 
+#include "MainCatCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Paper2D/Classes/PaperFlipbookComponent.h"
 
@@ -11,16 +14,23 @@ ACatCharacter::ACatCharacter()
 {
 	AccessorySprite = CreateDefaultSubobject<UPaperFlipbookComponent>("AccessorySprite");
 	AccessorySprite->SetupAttachment(GetSprite());
-
-	// Call Animate function when the player moves.
-	OnCharacterMovementUpdated.AddDynamic(this, &ACatCharacter::Animate);
 	
 	// Set Absolute Rotation and Initialize the default Flipbook.
 	GetSprite()->SetUsingAbsoluteRotation(true);
-
+	
 	bIsMoving = false;
 
 	InitializeFlipbooks();
+}
+
+void ACatCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	// Call Animate function Everytick.
+	Animate(DeltaSeconds, GetActorLocation(), GetVelocity());
+	
+	AlignCharacterToCamera();
 }
 
 void ACatCharacter::InitializeFlipbooks()
@@ -41,31 +51,32 @@ void ACatCharacter::InitializeFlipbooks()
 	// Checking Current Index and Setting a BaseFlipbook at the Start
 	if (CheckIndex(CatBodyShape, CatTexture))
 	{
-		GetSprite()->SetFlipbook(CatAnimationFlipbooks[CatTexture * MaxBodyShapes + CatBodyShape].IdleDown);
+		GetSprite()->SetFlipbook(CatAnimationFlipbooks[CatTexture * MaxBodyShapes + CatBodyShape].IdleUp);
 	}
 	if (CheckAccessoryNumber(CatAccessory))
 	{
-		GetAccessorySprite()->SetFlipbook(CatAccessoryFlipbooks[CatAccessory].IdleDown);
+		GetAccessorySprite()->SetFlipbook(CatAccessoryFlipbooks[CatAccessory].IdleUp);
 	}
+}
+
+void ACatCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	LoadFlipbooks();
 }
 
 void ACatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TOptional<FMinimalViewInfo> ViewInfo)
 {
-	// ViewInfo is set, continue
-	if (!ViewInfo.IsSet()) return;
-
-	// Calculate forward and Right vector of the character from the ViewInfo
-	const FVector Forward = UKismetMathLibrary::GetForwardVector(ViewInfo.GetValue().Rotation);
-	const FVector Right = UKismetMathLibrary::GetRightVector(ViewInfo.GetValue().Rotation);
+	// Calculate forward and Right vector of the character from the PlayerCameraPosition
+	const FVector Forward = GetSprite()->GetRightVector();
+	const FVector Right = GetSprite()->GetForwardVector();
 
 	// Forward Speed and Right Speed indicate the
 	// amount of similarity between Velocity and
 	// the Forward and Right Vector (Dot Product)
 	const float ForwardSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Forward) * 100) / 100;
 	const float RightSpeed = FMath::Floor(FVector::DotProduct(Velocity.GetSafeNormal(), Right) * 100) / 100;
-
-	// Temp Log
-	// UE_LOG(LogTemp, Warning, TEXT("Forward: %.2f, Right: %.2f"), ForwardSpeed, RightSpeed);
 
 	// Set is moving by checking the character speed
 	bIsMoving = RightSpeed != 0.0f || ForwardSpeed != 0.0f;
@@ -110,29 +121,47 @@ void ACatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TOptio
 
 void ACatCharacter::Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity)
 {
-	TOptional<FMinimalViewInfo> ViewInfo;
-	// If it is the player in control, take the camera into account and calculate the ViewInfo
-	if (IsPlayerControlled())
-	{
-		if (GetWorld())
-		{
-			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-			if (PlayerController)
-			{
-				ACharacter* Character = PlayerController->GetCharacter();
-				if (Character)
-				{
-					Character->CalcCamera(DeltaTime, ViewInfo.Emplace());
-				}
-			}
-		}
-	}
-
-	// Set Direction Based on ViewInfo
+	// Placeholder ViewInfo for AI cats (No Camera)
+	const TOptional<FMinimalViewInfo> ViewInfo;
+	
+	// Set Direction Based on Velocity
 	SetCurrentAnimationDirection(OldVelocity, ViewInfo);
 
 	// Assign CatAnimationFlipbooks based on direction
 	AssignFlipbooks(OldVelocity);
+}
+
+void ACatCharacter::AlignCharacterToCamera()
+{
+	// Get Camera Rotation to adjust player sprites to camera
+	const AMainCatCharacter* MainCatCharacter = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (!MainCatCharacter)
+	{
+		return;
+	}
+	const UCameraComponent* PlayerCamera = MainCatCharacter->GetPlayerCameraComponent();
+	if (!PlayerCamera)
+	{
+		return;
+	}
+	const FRotator CameraRotation = (GetActorLocation() - PlayerCamera->GetComponentLocation()).GetSafeNormal().ToOrientationRotator();
+
+	// A Temp Variable to adjust pitch while moving
+	float AdjustYawRotation = -90.0f;
+	if (CurrentCatFaceDirection == ECatFaceDirection::UpLeft ||
+			CurrentCatFaceDirection == ECatFaceDirection::DownRight)
+	{
+		AdjustYawRotation -= SpriteTiltYaw;
+	}
+	else if (CurrentCatFaceDirection == ECatFaceDirection::DownLeft ||
+		CurrentCatFaceDirection == ECatFaceDirection::UpRight)
+	{
+		AdjustYawRotation += SpriteTiltYaw;
+	}
+	
+	// Set rotation based on camera movement and player movement
+	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
+	GetAccessorySprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + AdjustYawRotation, CameraRotation.Roll));
 }
 
 void ACatCharacter::AssignFlipbooks(FVector const OldVelocity)
@@ -218,6 +247,22 @@ void ACatCharacter::AssignFlipbooks(FVector const OldVelocity)
 			break;
 		default: ;
 		}
+	}
+}
+
+void ACatCharacter::LoadFlipbooks()
+{
+	for (int i = 0; i < MaxBodyShapes; i++)
+	{
+		for (int j = 0; j < MaxTextures; j++)
+		{
+			LoadCatAnimationFlipbooks(i, j);
+		}
+	}
+
+	for (int i = 0; i < MaxAccessories; i++)
+	{
+		LoadCatAccessoryFlipbooks(i);
 	}
 }
 

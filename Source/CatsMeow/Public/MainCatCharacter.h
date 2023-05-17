@@ -6,6 +6,8 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractLogicDelegate);
+
 /**
  * 
  */
@@ -29,10 +31,54 @@ public:
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
+	UFUNCTION()
+	void OnInteract();
+
+	// Delegates
+	UPROPERTY(BlueprintAssignable)
+	FInteractLogicDelegate InteractLogicDelegate;
+	
+	// INLINE FUNCTIONS
+	// INCREMENT AND DECREMENT STATS
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHappiness()
+	{
+		CatHappinessCurrent = CatHappinessCurrent > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHappiness()
+	{
+		CatHappinessCurrent = CatHappinessCurrent < 0 ? 0 : CatHappinessCurrent - 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHunger()
+	{
+		CatHungerCurrent = CatHungerCurrent > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHunger()
+	{
+		CatHungerCurrent = CatHungerCurrent < 0 ? 0 : CatHungerCurrent - 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHygiene()
+	{
+		CatHygieneCurrent = CatHygieneCurrent > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHygiene()
+	{
+		CatHygieneCurrent = CatHygieneCurrent < 0 ? 0 : CatHygieneCurrent - 1;
+	}
+	UFUNCTION()
+	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
+
+	
 	// VARIABLES
 private:
 	// FUNCTIONS
-	void LoadFlipbooks();
+	void LoadPlayerSelectionFromSlot(FString SlotName);
+	void SavePlayerSelectionToSlot(FString SlotName);
 	
 	// VARIABLES
 	// Spring arm and Camera
@@ -41,6 +87,28 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
+
+	// Cat Stats
+	// Hunger
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHungerMax = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHungerCurrent = 2;
+
+	// Happiness
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHappinessMax = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHappinessCurrent = 2;
+
+	// Hygiene
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHygieneMax = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHygieneCurrent = 2;
 	
 protected:
 	// FUNCTIONS
@@ -48,7 +116,7 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	// Code for aligning character to the camera
-	void AlignCharacterToCamera() const;
+	virtual void AlignCharacterToCamera() override;
 	
 	// Clamping Camera rotation between CameraPitchMax and CameraPitchMin
 	void ClampCameraPitch() const;
@@ -60,10 +128,6 @@ protected:
 	virtual void Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity) override;
 
 	// VARIABLES
-	// The amount by which the cat sprite tilts
-	// when moving in (UpLeft, UpRight, DownRight, DownLeft)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	float SpriteTiltYaw = 40.f;
 
 	// Pitch clamp for camera.
 	float CameraPitchMax = 50.f;
