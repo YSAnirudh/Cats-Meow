@@ -26,11 +26,43 @@ public:
 	void LookUp(float AxisValue);
 	UFUNCTION()
 	void Turn(float AxisValue);
-
-	UFUNCTION()
-	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
 	
 	virtual void Tick(float DeltaSeconds) override;
+
+	// INLINE FUNCTIONS
+	// INCREMENT AND DECREMENT STATS
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHappiness()
+	{
+		CatHappinessCurrent = CatHappinessCurrent > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHappiness()
+	{
+		CatHappinessCurrent = CatHappinessCurrent < 0 ? 0 : CatHappinessCurrent - 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHunger()
+	{
+		CatHungerCurrent = CatHungerCurrent > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHunger()
+	{
+		CatHungerCurrent = CatHungerCurrent < 0 ? 0 : CatHungerCurrent - 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void IncrementHygiene()
+	{
+		CatHygieneCurrent = CatHygieneCurrent > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
+	}
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void DecrementHygiene()
+	{
+		CatHygieneCurrent = CatHygieneCurrent < 0 ? 0 : CatHygieneCurrent - 1;
+	}
+	UFUNCTION()
+	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
 	
 	// VARIABLES
 private:
@@ -51,19 +83,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	int32 CatHungerMax = 5;
 
-	int32 CatHungerCurrent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHungerCurrent = 2;
 
 	// Happiness
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	int32 CatHappinessMax = 5;
 
-	int32 CatHappinessCurrent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHappinessCurrent = 2;
 
 	// Hygiene
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	int32 CatHygieneMax = 5;
 
-	int32 CatHygieneCurrent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CatHygieneCurrent = 2;
 	
 protected:
 	// FUNCTIONS
