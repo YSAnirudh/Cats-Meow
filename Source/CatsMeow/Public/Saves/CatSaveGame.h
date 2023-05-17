@@ -18,4 +18,6 @@ public:
 	int32 CatBodyShapeNum = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData", meta=(AllowPrivateAccess = "true"))
 	int32 CatTextureNum = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData", meta=(AllowPrivateAccess = "true"))
+    int32 CatAccessoryNum = 0;
 };

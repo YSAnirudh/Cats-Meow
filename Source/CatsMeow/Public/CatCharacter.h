@@ -96,7 +96,7 @@ protected:
 
 	int32 MaxTextures = 2;
 	int32 MaxBodyShapes = 2;
-	int32 MaxAccessories = 2;
+	int32 MaxAccessories = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")
 	int32 CatTexture = 0;
