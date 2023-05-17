@@ -104,6 +104,11 @@ void AMainCatCharacter::Tick(float DeltaSeconds)
 	AlignCharacterToCamera();
 }
 
+void AMainCatCharacter::OnInteract()
+{
+	InteractLogicDelegate.Broadcast();
+}
+
 void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
 {
 	if (UCatSaveGame* GameDataInstance = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0)))
@@ -218,6 +223,8 @@ void AMainCatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAxis("LookUp", this, &AMainCatCharacter::LookUp);
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCatCharacter::Turn);
+
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMainCatCharacter::OnInteract);
 }
 
 void AMainCatCharacter::SetCurrentAnimationDirection(FVector const& Velocity, TOptional<FMinimalViewInfo> ViewInfo)

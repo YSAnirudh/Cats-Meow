@@ -15,7 +15,7 @@ AAICatCharacter::AAICatCharacter()
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Sphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(100.0f);
-	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));	
+	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 }
 
 void AAICatCharacter::Tick(float DeltaSeconds)
@@ -24,9 +24,35 @@ void AAICatCharacter::Tick(float DeltaSeconds)
 	
 }
 
+void AAICatCharacter::OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
+
+	if (MainCatRef)
+	{
+		bCanInteract = true;
+	}
+}
+
+void AAICatCharacter::OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
+
+	if (MainCatRef)
+	{
+		bCanInteract = false;
+	}
+}
+
 void AAICatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);
+	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AAICatCharacter::OnEndInteract);
+	
 	PatrolPoint = FVector(1000.f, 1000.f, 0.f);
 	const FVector WorldPatrolPoint = UKismetMathLibrary::TransformLocation(
 		GetActorTransform(),

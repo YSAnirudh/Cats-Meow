@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -22,9 +23,13 @@ ABaseEnvironmentActor::ABaseEnvironmentActor()
 	Collision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	SetRootComponent(Collision);
 	
-	
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>("EnvironmentSprite");
 	Sprite->SetupAttachment(RootComponent);
+
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
+	InteractionSphere->SetupAttachment(RootComponent);
+	InteractionSphere->SetSphereRadius(100.0f);
+	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	
 	// Set Absolute Rotation.
 	GetSprite()->SetUsingAbsoluteRotation(true);
@@ -35,6 +40,12 @@ void ABaseEnvironmentActor::BeginPlay()
 {
 	Super::BeginPlay();
 	Collision->AddForce(-GetActorUpVector() * 1000);
+
+	if (bIsInteractable)
+	{
+		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseEnvironmentActor::OnStartInteract);
+		InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseEnvironmentActor::OnEndInteract);
+	}
 }
 
 void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
@@ -61,6 +72,11 @@ void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
 	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + TempAdjustYaw, CameraRotation.Roll));
 }
 
+void ABaseEnvironmentActor::MainCharacterInteractFunction()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
+}
+
 // Called every frame
 void ABaseEnvironmentActor::Tick(float DeltaTime)
 {
@@ -68,6 +84,30 @@ void ABaseEnvironmentActor::Tick(float DeltaTime)
 	if (bAlignToCamera)
 	{
 		AlignEnvironmentAssetToCamera();
+	}
+}
+
+void ABaseEnvironmentActor::OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
+
+	if (MainCatRef)
+	{
+		bCanInteract = true;
+		MainCatRef->InteractLogicDelegate.AddDynamic(this, &ABaseEnvironmentActor::MainCharacterInteractFunction);
+	}
+}
+
+void ABaseEnvironmentActor::OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
+
+	if (MainCatRef)
+	{
+		bCanInteract = false;
+		MainCatRef->InteractLogicDelegate.RemoveDynamic(this, &ABaseEnvironmentActor::MainCharacterInteractFunction);
 	}
 }
 

@@ -6,6 +6,8 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractLogicDelegate);
+
 /**
  * 
  */
@@ -28,7 +30,14 @@ public:
 	void Turn(float AxisValue);
 	
 	virtual void Tick(float DeltaSeconds) override;
+	
+	UFUNCTION()
+	void OnInteract();
 
+	// Delegates
+	UPROPERTY(BlueprintAssignable)
+	FInteractLogicDelegate InteractLogicDelegate;
+	
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
 	UFUNCTION(BlueprintCallable)
@@ -63,6 +72,7 @@ public:
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
+
 	
 	// VARIABLES
 private:
