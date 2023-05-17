@@ -116,7 +116,7 @@ void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
 		CatBodyShape = GameDataInstance->CatBodyShapeNum;
 		CatTexture = GameDataInstance->CatTextureNum;
 		CatAccessory = GameDataInstance->CatAccessoryNum;
-		UE_LOG(LogTemp, Warning, TEXT("Accessory: %d"), GameDataInstance->CatAccessoryNum);
+		//UE_LOG(LogTemp, Warning, TEXT("Accessory: %d"), GameDataInstance->CatAccessoryNum);
 	}
 }
 

@@ -37,6 +37,8 @@ protected:
 	// VARIABLES
 private:
 	// FUNCTIONS
+	UFUNCTION()
+	virtual void MainCharacterInteractFunction();
 	
 	// VARIABLES
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))

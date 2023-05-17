@@ -28,7 +28,7 @@ ABaseEnvironmentActor::ABaseEnvironmentActor()
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(100.0f);
+	InteractionSphere->SetSphereRadius(40.0f);
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	
 	// Set Absolute Rotation.
@@ -74,7 +74,7 @@ void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
 
 void ABaseEnvironmentActor::MainCharacterInteractFunction()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
+	//UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
 }
 
 // Called every frame
