@@ -22,6 +22,7 @@ public:
 	/** Returns Accessory Sprite SubObject **/
 	FORCEINLINE class UPaperFlipbookComponent* GetAccessorySprite() const { return AccessorySprite; }
 
+	virtual void Tick(float DeltaSeconds) override;
 	// VARIABLES
 private:
 	// FUNCTIONS
@@ -29,10 +30,13 @@ private:
 	
 	// VARIABLES
 	// Accessory Sprite
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CatCharacter|Animation", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPaperFlipbookComponent> AccessorySprite;
 protected:
 	// FUNCTIONS
+	// Called when the game starts or the object is spawned
+	virtual void BeginPlay() override;
+	
 	// Calculates the current direction of the Character
 	virtual void SetCurrentAnimationDirection(FVector const& Velocity, TOptional<FMinimalViewInfo> ViewInfo);
 
@@ -40,8 +44,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "CatCharacter|Animation")
 	virtual void Animate(float DeltaTime, FVector OldLocation, FVector const OldVelocity);
 
+	// Code for aligning character to the camera
+	virtual void AlignCharacterToCamera();
+	
 	// Assign Flipbooks based on direction
 	virtual void AssignFlipbooks(FVector const OldVelocity);
+
+	// Load all the flipbooks
+	virtual void LoadFlipbooks();
 	
 	// Updating CatAnimationFlipbooks based on Cat Attributes (Body Shape and Body Texture)
 	void LoadCatAnimationFlipbooks(int32 BodyShapeNumber, int32 TextureNumber);
@@ -62,6 +72,9 @@ protected:
 
 	// Vector used to adjust the cat's direction when not moving
 	FVector CatRight = FVector();
+	// Rotator to store Temp Camera rotation used to adjust the cat's direction when not moving
+	FRotator TempCatRotation = FRotator();
+	// Temp Face Direction to adjust the cat's direction when not moving
 	ECatFaceDirection TempCatFaceDirection = ECatFaceDirection::Down;
 
 	// Flipbooks for Storing Animations of 2D Sprites
@@ -76,9 +89,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")
 	uint8 bIsMoving : 1;
 
+	// The amount by which the cat sprite tilts
+	// when moving in (UpLeft, UpRight, DownRight, DownLeft)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	float SpriteTiltYaw = 40.f;
+
 	int32 MaxTextures = 2;
 	int32 MaxBodyShapes = 2;
-	int32 MaxAccessories = 2;
+	int32 MaxAccessories = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")
 	int32 CatTexture = 0;
