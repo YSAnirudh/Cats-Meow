@@ -20,20 +20,21 @@ AMainCatCharacter::AMainCatCharacter()
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->SetRelativeRotation(FRotator(-20.0f, 0.f, 0.f));
-	SpringArmComponent->TargetArmLength = 1500.f;
-	SpringArmComponent->bDoCollisionTest = false;
+	SpringArmComponent->TargetArmLength = 200.f;
+	SpringArmComponent->bDoCollisionTest = true;
 	SpringArmComponent->bInheritPitch = true;
 	SpringArmComponent->bInheritRoll = false;
 	SpringArmComponent->bInheritYaw = true;
 	SpringArmComponent->bEnableCameraLag = true;
 	SpringArmComponent->bEnableCameraRotationLag = true;
-	SpringArmComponent->CameraLagSpeed = 4.0f;
+	SpringArmComponent->CameraLagSpeed = 8.0f;
 	SpringArmComponent->CameraRotationLagSpeed = 8.0f;
-	SpringArmComponent->CameraLagMaxDistance = 600.f;
+	SpringArmComponent->CameraLagMaxDistance = 50.f;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
-	CameraComponent->FieldOfView = 55.f;
+	CameraComponent->FieldOfView = 90.f;
+	CameraComponent->SetRelativeRotation(FRotator(10.0f, 0.f, 0.f));
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->PostProcessBlendWeight = 1.0f;
 	CameraComponent->PostProcessSettings.bOverride_DepthOfFieldFstop = true;
@@ -94,7 +95,9 @@ void AMainCatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadPlayerSelectionFromSlot(TEXT("CustomToInit"));
+	UE_LOG(LogTemp, Warning, TEXT("Character in Level: %s"), *GetWorld()->GetCurrentLevel()->GetName());
+	
+	LoadPlayerSelectionFromSlot(TEXT("MainSlot"));
 	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
 }
 
@@ -106,7 +109,7 @@ void AMainCatCharacter::Tick(float DeltaSeconds)
 
 void AMainCatCharacter::OnInteract()
 {
-	InteractLogicDelegate.Broadcast();
+	InteractLogicDelegate.Broadcast(this);
 }
 
 void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
@@ -116,13 +119,25 @@ void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
 		CatBodyShape = GameDataInstance->CatBodyShapeNum;
 		CatTexture = GameDataInstance->CatTextureNum;
 		CatAccessory = GameDataInstance->CatAccessoryNum;
+		CatHappinessCurrent = GameDataInstance->HappinessCurrent;
+		CatHungerCurrent = GameDataInstance->HungerCurrent;
+		CatHygieneCurrent = GameDataInstance->HygieneCurrent;
+		MapNumber = GameDataInstance->MapNumber;
 		//UE_LOG(LogTemp, Warning, TEXT("Accessory: %d"), GameDataInstance->CatAccessoryNum);
 	}
 }
 
 void AMainCatCharacter::SavePlayerSelectionToSlot(FString SlotName)
 {
-	
+	TObjectPtr<UCatSaveGame> GameDataInstance = Cast<UCatSaveGame>(UGameplayStatics::CreateSaveGameObject(UCatSaveGame::StaticClass()));
+	GameDataInstance->CatBodyShapeNum = CatBodyShape;
+	GameDataInstance->CatTextureNum = CatTexture;
+	GameDataInstance->CatAccessoryNum = CatAccessory;
+	GameDataInstance->HappinessCurrent = CatHappinessCurrent;
+	GameDataInstance->HungerCurrent = CatHungerCurrent;
+	GameDataInstance->HygieneCurrent = CatHygieneCurrent;
+	GameDataInstance->MapNumber = MapNumber;
+	UGameplayStatics::SaveGameToSlot(GameDataInstance, SlotName, 0);
 }
 
 void AMainCatCharacter::AlignCharacterToCamera()

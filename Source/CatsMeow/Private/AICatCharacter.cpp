@@ -24,9 +24,13 @@ void AAICatCharacter::Tick(float DeltaSeconds)
 	
 }
 
-void AAICatCharacter::MainCharacterInteractFunction()
+void AAICatCharacter::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
+	if (MainCatRef)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NPC Mini Game Open!!"));
+	}
 }
 
 void AAICatCharacter::OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -49,7 +53,7 @@ void AAICatCharacter::OnEndInteract(UPrimitiveComponent* OverlappedComponent, AA
 	if (MainCatRef)
 	{
 		bCanInteract = false;
-		MainCatRef->InteractLogicDelegate.AddDynamic(this, &AAICatCharacter::MainCharacterInteractFunction);
+		MainCatRef->InteractLogicDelegate.RemoveDynamic(this, &AAICatCharacter::MainCharacterInteractFunction);
 	}
 }
 

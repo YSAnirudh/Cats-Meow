@@ -6,8 +6,7 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractLogicDelegate);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractLogicDelegate, class AMainCatCharacter*, MainCatRef);
 /**
  * 
  */
@@ -18,6 +17,9 @@ class CATSMEOW_API AMainCatCharacter : public ACatCharacter
 public:
 	// FUNCTIONS
 	AMainCatCharacter();
+
+	void LoadPlayerSelectionFromSlot(FString SlotName);
+	void SavePlayerSelectionToSlot(FString SlotName);
 
 	// Input Handling Functions
 	UFUNCTION()
@@ -72,13 +74,15 @@ public:
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
+	UFUNCTION()
+	FORCEINLINE int32 GetCurrentMap() const { return MapNumber; }
+	UFUNCTION()
+	FORCEINLINE void SetCurrentMap(int32 MapNO) { this->MapNumber = MapNO; }
 
 	
 	// VARIABLES
 private:
 	// FUNCTIONS
-	void LoadPlayerSelectionFromSlot(FString SlotName);
-	void SavePlayerSelectionToSlot(FString SlotName);
 	
 	// VARIABLES
 	// Spring arm and Camera
@@ -88,6 +92,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* CameraComponent;
 
+	// Map Number
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 MapNumber = 0;
+	
 	// Cat Stats
 	// Hunger
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
@@ -133,5 +141,4 @@ protected:
 	float CameraPitchMax = 50.f;
 	float CameraPitchMin = 10.f;
 };
-
 
