@@ -7,13 +7,10 @@ AFoodBowl::AFoodBowl()
 {
 }
 
-void AFoodBowl::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
+void AFoodBowl::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction(MainCatRef);
+	Super::MainCharacterInteractFunction();
 
-	if (MainCatRef)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Food Bowl Mini Game Open!!"));
-		// Open Widget for MiniGame
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Food Bowl Mini Game Open!!"));
+	// Open Widget for MiniGame
 }

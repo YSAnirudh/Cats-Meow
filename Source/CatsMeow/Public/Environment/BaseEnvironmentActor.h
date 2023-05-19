@@ -36,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatRef);
+	virtual void MainCharacterInteractFunction();
 	// VARIABLES
 private:
 	// FUNCTIONS

@@ -38,7 +38,10 @@ protected:
 private:
 	// FUNCTIONS
 	UFUNCTION()
-	virtual void MainCharacterInteractFunction(class AMainCatCharacter* MainCatRef);
+	virtual void MainCharacterInteractFunction();
+
+	UFUNCTION()
+	void OnMiniGameFinish(bool bCatWon);
 	
 	// VARIABLES
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
@@ -46,6 +49,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	bool bCanInteract = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	bool bHasPlayedMiniGame = false;
 
 	// Cat AI Behavior Tree
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
@@ -55,4 +61,9 @@ private:
 	FVector PatrolPoint;
 
 	class ACatAIController* CatAIController = nullptr;
+
+	class UMiniGameWidget* MiniGameWidget = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MiniGame", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UMiniGameWidget> MiniGameWidgetClass;
 };

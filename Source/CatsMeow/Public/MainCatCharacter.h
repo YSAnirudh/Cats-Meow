@@ -6,7 +6,7 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractLogicDelegate, class AMainCatCharacter*, MainCatRef);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractLogicDelegate);
 /**
  * 
  */
@@ -45,32 +45,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHappiness()
 	{
-		CatHappinessCurrent = CatHappinessCurrent > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
+		CatHappinessCurrent = CatHappinessCurrent + 1 > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
+		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHappiness()
 	{
-		CatHappinessCurrent = CatHappinessCurrent < 0 ? 0 : CatHappinessCurrent - 1;
+		CatHappinessCurrent = CatHappinessCurrent - 1 < 0 ? 0 : CatHappinessCurrent - 1;
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHunger()
 	{
-		CatHungerCurrent = CatHungerCurrent > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+		CatHungerCurrent = CatHungerCurrent + 1 > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHunger()
 	{
-		CatHungerCurrent = CatHungerCurrent < 0 ? 0 : CatHungerCurrent - 1;
+		CatHungerCurrent = CatHungerCurrent - 1 < 0 ? 0 : CatHungerCurrent - 1;
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHygiene()
 	{
-		CatHygieneCurrent = CatHygieneCurrent > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
+		CatHygieneCurrent = CatHygieneCurrent + 1 > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
+		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHygiene()
 	{
-		CatHygieneCurrent = CatHygieneCurrent < 0 ? 0 : CatHygieneCurrent - 1;
+		CatHygieneCurrent = CatHygieneCurrent - 1 < 0 ? 0 : CatHygieneCurrent - 1;
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
@@ -117,6 +119,17 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	int32 CatHygieneCurrent = 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	float HappinessTimerCooldown = 30.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	float HygieneTimerCooldown = 30.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	float HungerTimerCooldown = 30.f;
+
+	FTimerHandle HappinessHandle;
+	FTimerHandle HygieneHandle;
+	FTimerHandle HungerHandle;
 	
 protected:
 	// FUNCTIONS

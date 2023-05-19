@@ -98,6 +98,9 @@ void AMainCatCharacter::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("Character in Level: %s"), *GetWorld()->GetCurrentLevel()->GetName());
 	
 	LoadPlayerSelectionFromSlot(TEXT("MainSlot"));
+
+	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
+	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
 	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
 }
 
@@ -109,7 +112,7 @@ void AMainCatCharacter::Tick(float DeltaSeconds)
 
 void AMainCatCharacter::OnInteract()
 {
-	InteractLogicDelegate.Broadcast(this);
+	InteractLogicDelegate.Broadcast();
 }
 
 void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)

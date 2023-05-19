@@ -70,7 +70,7 @@ void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
 	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + TempAdjustYaw, CameraRotation.Roll));
 }
 
-void ABaseEnvironmentActor::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
+void ABaseEnvironmentActor::MainCharacterInteractFunction()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("%d"), MainCatRef->GetHappiness());
 	

@@ -26,9 +26,9 @@ void ABuildingEnvironment::BeginPlay()
 	SetFlipbooks();
 }
 
-void ABuildingEnvironment::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
+void ABuildingEnvironment::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction(MainCatRef);
+	Super::MainCharacterInteractFunction();
 }
 
 void ABuildingEnvironment::LoadBuildingFlipbooks()
@@ -43,7 +43,6 @@ void ABuildingEnvironment::LoadBuildingFlipbooks()
 				FString("'/Game/Assets/Outside/Flipbooks/Buildings/FB_Building_") +
 					TierStyleValue + FString(".FB_Building_") + TierStyleValue + FString("'");
 
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *AnimationText);
 			BuildingFlipbooks[i * NumBuildingTiers + j] = LoadObject<UPaperFlipbook>(
 				nullptr,
 				*(AnimationText),

@@ -20,14 +20,11 @@ void AFoodStall::BeginPlay()
 	SetFlipbooks();
 }
 
-void AFoodStall::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
+void AFoodStall::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction(MainCatRef);
+	Super::MainCharacterInteractFunction();
 
-	if (MainCatRef)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Stall Mini Game Open!!"));
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Stall Mini Game Open!!"));
 }
 
 void AFoodStall::LoadStallFlipbooks()
@@ -39,7 +36,6 @@ void AFoodStall::LoadStallFlipbooks()
 			FString("'/Game/Assets/Outside/Flipbooks/FB_Stall_") +
 				TierStyleValue + FString(".FB_Stall_") + TierStyleValue + FString("'");
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *AnimationText);
 		StallFlipbooks[j] = LoadObject<UPaperFlipbook>(
 			nullptr,
 			*(AnimationText),

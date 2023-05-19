@@ -20,7 +20,7 @@ public:
 	// VARIABLES
 protected:
 	// FUNCTIONS
-	virtual void MainCharacterInteractFunction(class AMainCatCharacter* MainCatRef) override;
+	virtual void MainCharacterInteractFunction() override;
 
 	// VARIABLES
 private:

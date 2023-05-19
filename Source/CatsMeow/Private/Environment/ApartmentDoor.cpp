@@ -9,10 +9,15 @@ AApartmentDoor::AApartmentDoor()
 {
 }
 
-void AApartmentDoor::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
+void AApartmentDoor::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction(MainCatRef);
-	
+	Super::MainCharacterInteractFunction();
+
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!MainCatRef)
+	{
+		return;
+	}	
 	if (MainCatRef->GetCurrentMap() == -1)
 	{
 		const int32 MapToGo = FMath::RandRange(0, 3);
