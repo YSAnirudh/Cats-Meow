@@ -42,9 +42,9 @@ void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 			const int32 MinSpawnY = ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeY < 0 ?
 				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMinIndexRangeY;
 			const int32 MaxSpawnX = ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeX > GridDivisionsX - 1 ?
-				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeX;
+				GridDivisionsX - 1 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeX;
 			const int32 MaxSpawnY = ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY > GridDivisionsY - 1 ?
-				0 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY;
+				GridDivisionsY - 1 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY;
 
 			for (int i = MinSpawnX; i <= MaxSpawnX; i++)
 			{
@@ -143,11 +143,14 @@ void UPCGComponent::CreateGrid()
 				
 				if (bDebugRun)
 				{
+					uint8 Red = static_cast<uint8>((i / (float)GridDivisionsX) * 256); 
+					uint8 Blue = static_cast<uint8>((j / (float)GridDivisionsY) * 256); 
+					FColor BoxColor = FColor(Red, 0, Blue);
 					DrawDebugBox(
 						GetWorld(),
 						FVector(XPos, YPos, VolumeBoundsMax.Z),
 						FVector(XExtent, YExtent, 2.0f),
-						FColor::Green, !bEveryTick, -1, 0, 1
+						BoxColor, !bEveryTick, -1, 0, 1
 					);
 					DrawDebugPoint(
 						GetWorld(), SpawnPoint, 3, FColor::Blue, !bEveryTick, -1, 0

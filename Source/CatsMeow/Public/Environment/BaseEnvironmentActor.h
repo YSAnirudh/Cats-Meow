@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MainCatCharacter.h"
 #include "GameFramework/Actor.h"
 #include "BaseEnvironmentActor.generated.h"
 
@@ -34,13 +35,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatRef);
 	// VARIABLES
 private:
 	// FUNCTIONS
 	void AlignEnvironmentAssetToCamera();
-
-	UFUNCTION()
-	virtual void MainCharacterInteractFunction();
 
 	// VARIABLES
 	// Accessory Sprite

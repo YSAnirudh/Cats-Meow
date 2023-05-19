@@ -17,10 +17,9 @@ ABaseEnvironmentActor::ABaseEnvironmentActor()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	Collision = CreateDefaultSubobject<UBoxComponent>("Collision");
-	Collision->SetCollisionProfileName("BlockAllDynamic");
 	// Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	Collision->SetSimulatePhysics(true);
-	Collision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Collision->SetCollisionProfileName(TEXT("BlockAll"));
 	SetRootComponent(Collision);
 	
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>("EnvironmentSprite");
@@ -28,7 +27,7 @@ ABaseEnvironmentActor::ABaseEnvironmentActor()
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
-	InteractionSphere->SetSphereRadius(100.0f);
+	InteractionSphere->SetSphereRadius(40.0f);
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
 	
 	// Set Absolute Rotation.
@@ -39,8 +38,7 @@ ABaseEnvironmentActor::ABaseEnvironmentActor()
 void ABaseEnvironmentActor::BeginPlay()
 {
 	Super::BeginPlay();
-	Collision->AddForce(-GetActorUpVector() * 1000);
-
+	
 	if (bIsInteractable)
 	{
 		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseEnvironmentActor::OnStartInteract);
@@ -72,9 +70,10 @@ void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
 	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + TempAdjustYaw, CameraRotation.Roll));
 }
 
-void ABaseEnvironmentActor::MainCharacterInteractFunction()
+void ABaseEnvironmentActor::MainCharacterInteractFunction(AMainCatCharacter* MainCatRef)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), MainCatRef->GetHappiness());
+	
 }
 
 // Called every frame
