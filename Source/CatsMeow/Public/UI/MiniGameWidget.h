@@ -6,8 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "MiniGameWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameOverDelegate, bool, bCatWon);
-
 /**
  * 
  */
@@ -17,10 +15,10 @@ class CATSMEOW_API UMiniGameWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	// FUNCTIONS
+	UFUNCTION(BlueprintCallable)
+	void OnMiniGameFinish(bool bCatWon, int32 MiniGameNumber);
+	
 	// VARIABLES
-	UPROPERTY(BlueprintCallable)
-	FGameOverDelegate GameOverDelegate;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Result")
 	bool bWon = false;
 

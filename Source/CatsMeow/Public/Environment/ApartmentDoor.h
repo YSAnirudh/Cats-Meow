@@ -16,11 +16,12 @@ class CATSMEOW_API AApartmentDoor : public ABaseEnvironmentActor
 public:
 	// FUNCTIONS
 	AApartmentDoor();
+	virtual void MainCharacterInteractFunction() override;
+	virtual void SetCanInteract(bool bInteract) override;
 	
 	// VARIABLES
 protected:
 	// FUNCTIONS
-	virtual void MainCharacterInteractFunction() override;
 
 	// VARIABLES
 private:

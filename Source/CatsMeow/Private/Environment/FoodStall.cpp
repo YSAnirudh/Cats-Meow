@@ -5,10 +5,14 @@
 
 #include "PaperFlipbookComponent.h"
 #include "PaperFlipbook.h"
+#include "Kismet/GameplayStatics.h"
+#include "UI/MiniGameWidget.h"
 
 AFoodStall::AFoodStall()
 {
 	InitializeFlipbooks();
+
+	bIsInteractable = true;
 }
 
 void AFoodStall::BeginPlay()
@@ -22,9 +26,33 @@ void AFoodStall::BeginPlay()
 
 void AFoodStall::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction();
+	if (bIsInteractable && !bHasPlayedMiniGame)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Stall Mini Game Open!!"));
+		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
+		{
+			MiniGameWidget->AddToViewport();
+			bHasPlayedMiniGame = true;
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			if (MainCatRef)
+			{
+				bCanInteract = false;
+				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+				MainCatRef->RemoveInteractableFromSet(this);
+			}
+		}
+	} else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
+	}
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("Stall Mini Game Open!!"));
+void AFoodStall::SetCanInteract(bool bInteract)
+{
+	if (bIsInteractable)
+	{
+		bCanInteract = bInteract;
+	}
 }
 
 void AFoodStall::LoadStallFlipbooks()

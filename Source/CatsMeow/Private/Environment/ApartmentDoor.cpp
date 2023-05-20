@@ -11,8 +11,6 @@ AApartmentDoor::AApartmentDoor()
 
 void AApartmentDoor::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction();
-
 	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if (!MainCatRef)
 	{
@@ -55,5 +53,13 @@ void AApartmentDoor::MainCharacterInteractFunction()
 		MainCatRef->SetCurrentMap(-1);
 		MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("CatApartment"));
+	}
+}
+
+void AApartmentDoor::SetCanInteract(bool bInteract)
+{
+	if (bIsInteractable)
+	{
+		bCanInteract = bInteract;
 	}
 }

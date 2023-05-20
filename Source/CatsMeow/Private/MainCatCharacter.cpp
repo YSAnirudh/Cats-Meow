@@ -3,7 +3,9 @@
 
 #include "../Public/MainCatCharacter.h"
 
+#include "AICatCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Environment/BaseEnvironmentActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -108,11 +110,128 @@ void AMainCatCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	AlignCharacterToCamera();
+	HandleInteractionAbility();
 }
 
 void AMainCatCharacter::OnInteract()
 {
-	InteractLogicDelegate.Broadcast();
+	if (InteractableActor)
+	{
+	 	AAICatCharacter* AICatCharacter = Cast<AAICatCharacter>(InteractableActor);
+		if (AICatCharacter)
+		{
+			AICatCharacter->MainCharacterInteractFunction();
+		}
+		else
+		{
+			ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(InteractableActor);
+			if (EnvActor)
+			{
+				EnvActor->MainCharacterInteractFunction();
+			}
+		}
+	}
+}
+
+AActor* AMainCatCharacter::FindInteractable()
+{
+	if (InteractableActors.Num() == 0)
+	{
+		return nullptr;
+	}
+	const FVector CatForward = CameraComponent->GetForwardVector();
+
+	float DotSimilarity = 0.0f;
+
+	TArray<AActor*> SimilarActors;
+	for (auto Interactable : InteractableActors)
+	{
+		const FVector CatToInteractable = (Interactable->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+
+		DotSimilarity = FVector::DotProduct(CatForward, CatToInteractable);
+
+		if (DotSimilarity > 0.75)
+		{
+			SimilarActors.Add(Interactable);
+		}
+	}
+
+	if (SimilarActors.Num() == 0)
+	{
+		return nullptr;
+	}
+	
+	if (SimilarActors.Num() == 1)
+	{
+		return SimilarActors[0];
+	}
+
+	int32 IndexOfActorThatCanInteract = 0;
+	float LeastDistance = 100000.f;
+	for (int i = 0; i < SimilarActors.Num(); i++)
+	{
+		const float Distance = (SimilarActors[i]->GetActorLocation() - GetActorLocation()).Size();
+
+		if (Distance < LeastDistance)
+		{
+			IndexOfActorThatCanInteract = i;
+			LeastDistance = Distance;
+		}
+	}
+
+	return SimilarActors[IndexOfActorThatCanInteract];
+}
+
+void AMainCatCharacter::HandleInteractionAbility()
+{
+	InteractableActor = FindInteractable();
+	if (!InteractableActor)
+	{
+		AAICatCharacter* CatCharacter = Cast<AAICatCharacter>(PrevInteractableActor);
+		if (CatCharacter)
+		{
+			CatCharacter->SetCanInteract(false);
+		}
+		else
+		{
+			ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(PrevInteractableActor);
+			if (EnvActor)
+			{
+				EnvActor->SetCanInteract(false);
+			}
+		}
+		PrevInteractableActor = nullptr;
+		return;
+	} 
+	if (PrevInteractableActor != InteractableActor)
+	{
+		AAICatCharacter* CatCharacter = Cast<AAICatCharacter>(InteractableActor);
+		if (CatCharacter)
+		{
+			CatCharacter->SetCanInteract(true);
+		}
+		else
+		{
+			ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(InteractableActor);
+			if (EnvActor)
+			{
+				EnvActor->SetCanInteract(true);
+			}
+		}
+		CatCharacter = Cast<AAICatCharacter>(PrevInteractableActor);
+		if (CatCharacter)
+		{
+			CatCharacter->SetCanInteract(false);
+		} else
+		{
+			ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(PrevInteractableActor);
+			if (EnvActor)
+			{
+				EnvActor->SetCanInteract(false);
+			}
+		}
+		PrevInteractableActor = InteractableActor;
+	}
 }
 
 void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)

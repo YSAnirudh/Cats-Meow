@@ -46,6 +46,36 @@ void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 			const int32 MaxSpawnY = ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY > GridDivisionsY - 1 ?
 				GridDivisionsY - 1 : ActorData.SpawnRegions[SpawnRegion].SpawnMaxIndexRangeY;
 
+			
+			if (bDebugRun) 
+			{
+				if (ParentVolumeRef)
+				{
+					const FVector VolumeBoundsMin = ParentVolumeRef->GetComponentsBoundingBox().Min;
+					const FVector VolumeBoundsMax = ParentVolumeRef->GetComponentsBoundingBox().Max;
+					const FVector VolumeBoundsExtent = ParentVolumeRef->GetComponentsBoundingBox().GetExtent();
+
+					const float GridSizeX = VolumeBoundsExtent.X * 2.0f / GridDivisionsX;
+					const float GridSizeY = VolumeBoundsExtent.Y * 2.0f / GridDivisionsY;
+
+
+					for (int i = MinSpawnX; i <= MaxSpawnX; i++)
+					{
+						for (int j = MinSpawnY; j <= MaxSpawnY; j++)
+						{
+							const float XPos = VolumeBoundsMin.X + (GridSizeX * i) + GridSizeX / 2;
+							const float YPos = VolumeBoundsMin.Y + (GridSizeY * j) + GridSizeY / 2;
+							FColor PointColor = FColor(((float)SpawnRegion / ActorData.SpawnRegions.Num() - 1) * 256);
+							FVector SpawnPoint = FVector(XPos, YPos, VolumeBoundsMax.Z);
+							DrawDebugPoint(
+								GetWorld(), SpawnPoint, 10, PointColor, !bEveryTick, -1, 0
+							);
+						}
+					}
+					
+				}
+			}
+
 			for (int i = MinSpawnX; i <= MaxSpawnX; i++)
 			{
 				for (int j = MinSpawnY; j <= MaxSpawnY; j++)

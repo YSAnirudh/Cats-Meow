@@ -28,6 +28,13 @@ public:
 	void OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION()
+	FORCEINLINE int32 GetCanInteract() const { return bCanInteract; }
+	UFUNCTION()
+	virtual void SetCanInteract(bool bInteract);
+	
+	UFUNCTION()
+	virtual void MainCharacterInteractFunction();
 	
 	// VARIABLES
 protected:
@@ -35,8 +42,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	virtual void MainCharacterInteractFunction();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	bool bHasPlayedMiniGame = false;
+
+	class UMiniGameWidget* MiniGameWidget = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MiniGame", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UMiniGameWidget> MiniGameWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	bool bIsInteractable = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	bool bCanInteract = false;
 	// VARIABLES
 private:
 	// FUNCTIONS
@@ -58,10 +76,4 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Environment", meta = (AllowPrivateAccess = "true"))
 	float TempAdjustYaw = -90.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
-	bool bIsInteractable = false;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
-	bool bCanInteract = false;
 };
