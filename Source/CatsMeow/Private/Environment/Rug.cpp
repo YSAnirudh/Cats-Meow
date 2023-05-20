@@ -14,27 +14,25 @@ ARug::ARug()
 
 void ARug::MainCharacterInteractFunction()
 {
-	Super::MainCharacterInteractFunction();
-
-	if (!bHasPlayedMiniGame)
+	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
-		AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		if (MainCatRef)
-		{
-			MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		}
-
 		UE_LOG(LogTemp, Warning, TEXT("Rug Mini Game Open!!"));
-		if (MiniGameWidget)
+		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
 		{
 			MiniGameWidget->AddToViewport();
+			bHasPlayedMiniGame = true;
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			if (MainCatRef)
+			{
+				bCanInteract = false;
+				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+				MainCatRef->RemoveInteractableFromSet(this);
+			}
 		}
 	} else
 	{
-		
 		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
 	}
-	// Open Widget for MiniGame
 }
 
 void ARug::BeginPlay()
@@ -44,7 +42,6 @@ void ARug::BeginPlay()
 	if (!MiniGameWidget && MiniGameWidgetClass)
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
-		MiniGameWidget->GameOverDelegate.AddDynamic(this, &ARug::OnMiniGameFinish);
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body = CatSaveGame->CatBodyShapeNum;
 		int32 Texture = CatSaveGame->CatTextureNum;
@@ -56,13 +53,13 @@ void ARug::BeginPlay()
 void ARug::OnMiniGameFinish(bool bCatWon)
 {
 	bHasPlayedMiniGame = true;
-	if (bCatWon)
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (MainCatRef)
 	{
-		AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		if (MainCatRef)
+		MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (bCatWon)
 		{
-			MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			MainCatRef->IncrementHappiness();
+			MainCatRef->IncrementHygiene();
 		}
 	}
 	if (MiniGameWidget)

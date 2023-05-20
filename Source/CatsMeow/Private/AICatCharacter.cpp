@@ -27,20 +27,7 @@ AAICatCharacter::AAICatCharacter()
 
 void AAICatCharacter::OnMiniGameFinish(bool bCatWon)
 {
-	bHasPlayedMiniGame = true;
-	if (bCatWon)
-	{
-		AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		if (MainCatRef)
-		{
-			MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			MainCatRef->IncrementHappiness();
-		}
-	}
-	if (MiniGameWidget)
-	{
-		MiniGameWidget->RemoveFromViewport();
-	}
+	
 }
 
 void AAICatCharacter::Tick(float DeltaSeconds)
@@ -55,21 +42,21 @@ void AAICatCharacter::MainCharacterInteractFunction()
 	
 	if (!bHasPlayedMiniGame)
 	{
-		AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		if (MainCatRef)
-		{
-			MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		}
-
-
 		UE_LOG(LogTemp, Warning, TEXT("NPC Mini Game Open!!"));
-		if (MiniGameWidget)
+		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
 		{
 			MiniGameWidget->AddToViewport();
+			bHasPlayedMiniGame = true;
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			if (MainCatRef)
+			{
+				bCanInteract = false;
+				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+				MainCatRef->RemoveInteractableFromSet(this);
+			}
 		}
 	} else
 	{
-		
 		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
 	}
 }
@@ -77,24 +64,30 @@ void AAICatCharacter::MainCharacterInteractFunction()
 void AAICatCharacter::OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (bHasPlayedMiniGame)
+	{
+		return;
+	}
 	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
 
 	if (MainCatRef)
 	{
-		bCanInteract = true;
-		MainCatRef->InteractLogicDelegate.AddDynamic(this, &AAICatCharacter::MainCharacterInteractFunction);
+		MainCatRef->AddInteractableToSet(this);
 	}
 }
 
 void AAICatCharacter::OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (bHasPlayedMiniGame)
+	{
+		return;
+	}
 	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
 
 	if (MainCatRef)
 	{
-		bCanInteract = false;
-		MainCatRef->InteractLogicDelegate.RemoveDynamic(this, &AAICatCharacter::MainCharacterInteractFunction);
+		MainCatRef->RemoveInteractableFromSet(this);
 	}
 }
 
@@ -102,10 +95,11 @@ void AAICatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bHasPlayedMiniGame = false;
+
 	if (!MiniGameWidget && MiniGameWidgetClass)
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
-		MiniGameWidget->GameOverDelegate.AddDynamic(this, &AAICatCharacter::OnMiniGameFinish);
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body = CatSaveGame->CatBodyShapeNum;
 		int32 Texture = CatSaveGame->CatTextureNum;

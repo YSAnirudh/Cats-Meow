@@ -6,7 +6,6 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractLogicDelegate);
 /**
  * 
  */
@@ -36,10 +35,6 @@ public:
 	UFUNCTION()
 	void OnInteract();
 
-	// Delegates
-	UPROPERTY(BlueprintAssignable)
-	FInteractLogicDelegate InteractLogicDelegate;
-	
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
 	UFUNCTION(BlueprintCallable)
@@ -80,11 +75,17 @@ public:
 	FORCEINLINE int32 GetCurrentMap() const { return MapNumber; }
 	UFUNCTION()
 	FORCEINLINE void SetCurrentMap(int32 MapNO) { this->MapNumber = MapNO; }
+	UFUNCTION()
+	FORCEINLINE void AddInteractableToSet(AActor* Actor) { InteractableActors.Add(Actor); }
+	UFUNCTION()
+	FORCEINLINE void RemoveInteractableFromSet(const AActor* Actor) { InteractableActors.Remove(Actor); }
 
 	
 	// VARIABLES
 private:
 	// FUNCTIONS
+	AActor* FindInteractable();
+	void HandleInteractionAbility();
 	
 	// VARIABLES
 	// Spring arm and Camera
@@ -121,9 +122,9 @@ private:
 	int32 CatHygieneCurrent = 2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
-	float HappinessTimerCooldown = 30.f;
+	float HappinessTimerCooldown = 15.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
-	float HygieneTimerCooldown = 30.f;
+	float HygieneTimerCooldown = 45.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	float HungerTimerCooldown = 30.f;
 
@@ -153,5 +154,12 @@ protected:
 	// Pitch clamp for camera.
 	float CameraPitchMax = 50.f;
 	float CameraPitchMin = 10.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	TSet<AActor*> InteractableActors;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	AActor* InteractableActor = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
+	AActor* PrevInteractableActor = nullptr;
 };
 

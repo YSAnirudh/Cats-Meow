@@ -24,6 +24,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void MainCharacterInteractFunction() override;
+
+	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES
 	// Flipbooks for Storing Animations of 2D Sprites
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CatCharacter|Config")

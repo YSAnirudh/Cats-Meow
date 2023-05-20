@@ -70,10 +70,13 @@ void ABaseEnvironmentActor::AlignEnvironmentAssetToCamera()
 	GetSprite()->SetWorldRotation(FRotator(0.0f, CameraRotation.Yaw + TempAdjustYaw, CameraRotation.Roll));
 }
 
+void ABaseEnvironmentActor::SetCanInteract(bool bInteract)
+{
+	bCanInteract = false;
+}
+
 void ABaseEnvironmentActor::MainCharacterInteractFunction()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), MainCatRef->GetHappiness());
-	
 }
 
 // Called every frame
@@ -93,8 +96,7 @@ void ABaseEnvironmentActor::OnStartInteract(UPrimitiveComponent* OverlappedCompo
 
 	if (MainCatRef)
 	{
-		bCanInteract = true;
-		MainCatRef->InteractLogicDelegate.AddDynamic(this, &ABaseEnvironmentActor::MainCharacterInteractFunction);
+		MainCatRef->AddInteractableToSet(this);
 	}
 }
 
@@ -105,8 +107,7 @@ void ABaseEnvironmentActor::OnEndInteract(UPrimitiveComponent* OverlappedCompone
 
 	if (MainCatRef)
 	{
-		bCanInteract = false;
-		MainCatRef->InteractLogicDelegate.RemoveDynamic(this, &ABaseEnvironmentActor::MainCharacterInteractFunction);
+		MainCatRef->RemoveInteractableFromSet(this);
 	}
 }
 

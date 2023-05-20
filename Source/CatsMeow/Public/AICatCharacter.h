@@ -29,7 +29,12 @@ public:
 	void OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
+	UFUNCTION()
+	virtual void MainCharacterInteractFunction();
+	UFUNCTION()
+	FORCEINLINE int32 GetCanInteract() const { return bCanInteract; }
+	UFUNCTION()
+	FORCEINLINE void SetCanInteract(bool bInteract) { this->bCanInteract = bInteract; }
 	// VARIABLES
 protected:
 	// FUNCTIONS
@@ -37,8 +42,6 @@ protected:
 	// VARIABLES
 private:
 	// FUNCTIONS
-	UFUNCTION()
-	virtual void MainCharacterInteractFunction();
 
 	UFUNCTION()
 	void OnMiniGameFinish(bool bCatWon);
