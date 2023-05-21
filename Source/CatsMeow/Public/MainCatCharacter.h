@@ -35,6 +35,9 @@ public:
 	UFUNCTION()
 	void OnInteract();
 
+	UFUNCTION(BlueprintCallable)
+	void IncrementMiniGameCount();
+
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
 	UFUNCTION(BlueprintCallable)
@@ -131,7 +134,13 @@ private:
 	FTimerHandle HappinessHandle;
 	FTimerHandle HygieneHandle;
 	FTimerHandle HungerHandle;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	TMap<int32, int32> MinimumMiniGamesPerMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CurrentMiniGamesPlayed = 0;
+	bool bCanInteractWithDoor = false;
 protected:
 	// FUNCTIONS
 	virtual void BeginPlay() override;

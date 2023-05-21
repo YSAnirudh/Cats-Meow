@@ -25,11 +25,6 @@ AAICatCharacter::AAICatCharacter()
 	CatAccessory = FMath::RandRange(0, MaxAccessories-1);
 }
 
-void AAICatCharacter::OnMiniGameFinish(bool bCatWon)
-{
-	
-}
-
 void AAICatCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

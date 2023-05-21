@@ -35,6 +35,14 @@ void ARug::MainCharacterInteractFunction()
 	}
 }
 
+void ARug::SetCanInteract(bool bInteract)
+{
+	if (bIsInteractable)
+	{
+		bCanInteract = bInteract;
+	}
+}
+
 void ARug::BeginPlay()
 {
 	Super::BeginPlay();
@@ -47,23 +55,5 @@ void ARug::BeginPlay()
 		int32 Texture = CatSaveGame->CatTextureNum;
 		
 		MiniGameWidget->CatSelection = Body * 2 + Texture;
-	}
-}
-
-void ARug::OnMiniGameFinish(bool bCatWon)
-{
-	bHasPlayedMiniGame = true;
-	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (MainCatRef)
-	{
-		MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		if (bCatWon)
-		{
-			MainCatRef->IncrementHygiene();
-		}
-	}
-	if (MiniGameWidget)
-	{
-		MiniGameWidget->RemoveFromViewport();
 	}
 }

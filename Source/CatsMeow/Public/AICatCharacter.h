@@ -42,9 +42,6 @@ protected:
 	// VARIABLES
 private:
 	// FUNCTIONS
-
-	UFUNCTION()
-	void OnMiniGameFinish(bool bCatWon);
 	
 	// VARIABLES
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
