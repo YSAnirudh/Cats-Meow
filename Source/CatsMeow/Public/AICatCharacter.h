@@ -22,9 +22,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool GetCanCharacterInteract() const { return bCanInteract; }
 
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE class UBehaviorTree* GetBehaviorTree() const { return BehaviourTree; }
-
 	UFUNCTION()
 	void OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
@@ -53,14 +50,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (AllowPrivateAccess = "true"))
 	bool bHasPlayedMiniGame = false;
 
-	// Cat AI Behavior Tree
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	class UBehaviorTree* BehaviourTree;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
 	FVector PatrolPoint;
-
-	class ACatAIController* CatAIController = nullptr;
 
 	class UMiniGameWidget* MiniGameWidget = nullptr;
 	

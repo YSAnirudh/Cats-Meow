@@ -6,6 +6,8 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotificationDelegate, FString, Notification);
+
 /**
  * 
  */
@@ -38,6 +40,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IncrementMiniGameCount();
 
+	UFUNCTION()
+	void OnNotifyPlayer(const FString& Notification);
+
+	UPROPERTY(BlueprintAssignable)
+	FNotificationDelegate NotificationDelegate;
+
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
 	UFUNCTION(BlueprintCallable)
@@ -45,32 +53,38 @@ public:
 	{
 		CatHappinessCurrent = CatHappinessCurrent + 1 > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
 		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
+		OnNotifyPlayer(TEXT("Happiness +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHappiness()
 	{
 		CatHappinessCurrent = CatHappinessCurrent - 1 < 0 ? 0 : CatHappinessCurrent - 1;
+		OnNotifyPlayer(TEXT("Happiness -1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent + 1 > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+		OnNotifyPlayer(TEXT("Hunger +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent - 1 < 0 ? 0 : CatHungerCurrent - 1;
+		OnNotifyPlayer(TEXT("Hunger -1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent + 1 > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
 		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
+		OnNotifyPlayer(TEXT("Hygiene +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent - 1 < 0 ? 0 : CatHygieneCurrent - 1;
+		OnNotifyPlayer(TEXT("Hygiene -1"));
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }

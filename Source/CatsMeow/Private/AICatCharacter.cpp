@@ -107,7 +107,7 @@ void AAICatCharacter::BeginPlay()
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AAICatCharacter::OnEndInteract);
 	
-	PatrolPoint = FVector(1000.f, 1000.f, 0.f);
+	PatrolPoint = FVector(-610.f, 0.f, 0.f);
 	const FVector WorldPatrolPoint = UKismetMathLibrary::TransformLocation(
 		GetActorTransform(),
 		PatrolPoint
@@ -118,18 +118,4 @@ void AAICatCharacter::BeginPlay()
 		WorldPatrolPoint,
 		3.f, FColor::Black, true
 	);
-	CatAIController = Cast<ACatAIController>(GetController());
-	if (!CatAIController)
-	{
-		CatAIController = Cast<ACatAIController>(GetController());
-	}
-	if (CatAIController)
-	{
-		CatAIController->GetCatBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WorldPatrolPoint);
-
-		//UE_LOG(LogTemp, Warning, TEXT("BBAI: %s"), *CatAIController->GetCatBlackboardComponent()->GetValueAsVector(TEXT("PatrolPoint")).ToString());
-		//UE_LOG(LogTemp, Warning, TEXT("World: %s"), *WorldPatrolPoint.ToString());
-		
-		CatAIController->RunBehaviorTree(BehaviourTree);
-	}
 }

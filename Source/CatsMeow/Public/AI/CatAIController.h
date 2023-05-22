@@ -25,6 +25,7 @@ public:
 	// VARIABLES
 protected:
 	// FUNCTIONS
+	virtual void BeginPlay() override;
 	
 	// VARIABLES
 private:
@@ -37,4 +38,8 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	class UBehaviorTreeComponent* BehaviourTreeComponent;
+
+	// Cat AI Behavior Tree
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	class UBehaviorTree* BehaviourTree;
 };

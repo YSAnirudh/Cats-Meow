@@ -26,12 +26,19 @@ void ACatAIController::OnPossess(APawn* InPawn)
 		return;
 	}
 
-	AAICatCharacter* AICatCharacter = Cast<AAICatCharacter>(InPawn);
-	if (AICatCharacter)
+	if (Blackboard && BehaviourTree)
 	{
-		if (AICatCharacter->GetBehaviorTree())
-		{
-			BlackboardComponent->InitializeBlackboard(*AICatCharacter->GetBehaviorTree()->BlackboardAsset);
-		}
+		Blackboard->InitializeBlackboard(*BehaviourTree->BlackboardAsset);
+	}
+}
+
+void ACatAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (BehaviourTree)
+	{
+		RunBehaviorTree(BehaviourTree);
+		BehaviourTreeComponent->StartTree(*BehaviourTree);
 	}
 }

@@ -160,6 +160,11 @@ void AMainCatCharacter::IncrementMiniGameCount()
 	}
 }
 
+void AMainCatCharacter::OnNotifyPlayer(const FString& Notification)
+{
+	NotificationDelegate.Broadcast(Notification);
+}
+
 AActor* AMainCatCharacter::FindInteractable()
 {
 	if (InteractableActors.Num() == 0)
