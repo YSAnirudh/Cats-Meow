@@ -105,10 +105,13 @@ void AAICatCharacter::BeginPlay()
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body = CatSaveGame->CatBodyShapeNum;
 		int32 Texture = CatSaveGame->CatTextureNum;
-		
-		MiniGameWidget->CatSelection = Body * MaxBodyShapes + Texture;
-		MiniGameWidget->AICatSelection = CatBodyShape * MaxBodyShapes + CatTexture;
-		MiniGameWidget->AICatAccessory = CatAccessory;
+
+		if (IsValid(MiniGameWidget))
+		{
+			MiniGameWidget->CatSelection = Body * MaxBodyShapes + Texture;
+			MiniGameWidget->AICatSelection = CatBodyShape * MaxBodyShapes + CatTexture;
+			MiniGameWidget->AICatAccessory = CatAccessory;
+		}
 	}
 
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);

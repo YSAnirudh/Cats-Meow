@@ -58,7 +58,10 @@ void ARug::BeginPlay()
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body = CatSaveGame->CatBodyShapeNum;
 		int32 Texture = CatSaveGame->CatTextureNum;
-		
-		MiniGameWidget->CatSelection = Body * 2 + Texture;
+
+		if (IsValid(MiniGameWidget))
+		{
+			MiniGameWidget->CatSelection = Body * 2 + Texture;
+		}
 	}
 }
