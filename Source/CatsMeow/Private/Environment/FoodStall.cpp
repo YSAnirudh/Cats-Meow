@@ -29,7 +29,12 @@ void AFoodStall::MainCharacterInteractFunction()
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Stall Mini Game Open!!"));
-		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
+		if (!IsValid(MiniGameWidget))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Widget"));
+			return;
+		}
+		if (IsValid(MiniGameWidget) && !MiniGameWidget->IsInViewport())
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
@@ -57,34 +62,27 @@ void AFoodStall::SetCanInteract(bool bInteract)
 
 void AFoodStall::LoadStallFlipbooks()
 {
-	for (int j = 0; j < NumStalls; j++)
-	{
-		const FString TierStyleValue = FString::FromInt(j);
-		const FString AnimationText =
-			FString("'/Game/Assets/Outside/Flipbooks/FB_Stall_") +
-				TierStyleValue + FString(".FB_Stall_") + TierStyleValue + FString("'");
+	const FString TierStyleValue = FString::FromInt(1);
+	const FString AnimationText =
+		FString("'/Game/Assets/Outside/Flipbooks/FB_Stall_") +
+			TierStyleValue + FString(".FB_Stall_") + TierStyleValue + FString("'");
 
-		StallFlipbooks[j] = LoadObject<UPaperFlipbook>(
-			nullptr,
-			*(AnimationText),
-			nullptr,
-			LOAD_None,
-			nullptr
-		);
-	}
+	StallFlipbooks[0] = LoadObject<UPaperFlipbook>(
+		nullptr,
+		*(AnimationText),
+		nullptr,
+		LOAD_None,
+		nullptr
+	);
 }
 
 void AFoodStall::InitializeFlipbooks()
 {
 	StallFlipbooks.Empty();
-	for (int j = 0; j < NumStalls; j++)
-	{
-		StallFlipbooks.Push(TObjectPtr<UPaperFlipbook>());
-	}
+	StallFlipbooks.Push(TObjectPtr<UPaperFlipbook>());
 }
 
 void AFoodStall::SetFlipbooks()
 {
-	const int32 StyleNum = FMath::RandRange(0, NumStalls-1);
-	GetSprite()->SetFlipbook(StallFlipbooks[StyleNum]);
+	GetSprite()->SetFlipbook(StallFlipbooks[0]);
 }

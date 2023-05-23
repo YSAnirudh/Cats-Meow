@@ -38,7 +38,14 @@ void AAICatCharacter::MainCharacterInteractFunction()
 	if (!bHasPlayedMiniGame)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NPC Mini Game Open!!"));
-		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
+
+		if (!IsValid(MiniGameWidget))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Widget"));
+			return;
+		}
+		
+		if (IsValid(MiniGameWidget) && !MiniGameWidget->IsInViewport())
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;

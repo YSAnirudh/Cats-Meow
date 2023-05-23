@@ -100,8 +100,8 @@ void AMainCatCharacter::BeginPlay()
 
 	LoadPlayerSelectionFromSlot(TEXT("MainSlot"));
 
-	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
-	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
+	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
+	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
 	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
 
 	bCanInteractWithDoor = false;
@@ -160,9 +160,8 @@ void AMainCatCharacter::IncrementMiniGameCount()
 	}
 }
 
-void AMainCatCharacter::OnNotifyPlayer(const FString& Notification)
+void AMainCatCharacter::OnNotifyPlayer_Implementation(const FString& Notification)
 {
-	NotificationDelegate.Broadcast(Notification);
 }
 
 AActor* AMainCatCharacter::FindInteractable()

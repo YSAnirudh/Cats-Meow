@@ -6,8 +6,6 @@
 #include "CatCharacter.h"
 #include "MainCatCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNotificationDelegate, FString, Notification);
-
 /**
  * 
  */
@@ -40,11 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IncrementMiniGameCount();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnNotifyPlayer(const FString& Notification);
-
-	UPROPERTY(BlueprintAssignable)
-	FNotificationDelegate NotificationDelegate;
 
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
@@ -52,7 +47,8 @@ public:
 	FORCEINLINE void IncrementHappiness()
 	{
 		CatHappinessCurrent = CatHappinessCurrent + 1 > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
-		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
+		GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
+		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
 		OnNotifyPlayer(TEXT("Happiness +1"));
 	}
 	UFUNCTION(BlueprintCallable)
@@ -77,7 +73,8 @@ public:
 	FORCEINLINE void IncrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent + 1 > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
-		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
+		GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
+		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
 		OnNotifyPlayer(TEXT("Hygiene +1"));
 	}
 	UFUNCTION(BlueprintCallable)

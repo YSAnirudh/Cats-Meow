@@ -45,5 +45,5 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BuildingStyle", meta = (AllowPrivateAccess = "true"))
 	int32 NumBuildingTiers = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BuildingStyle", meta = (AllowPrivateAccess = "true"))
-	int32 NumBuildingAssets = 3;
+	int32 NumBuildingAssets = 5;
 };
