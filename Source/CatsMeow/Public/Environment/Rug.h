@@ -19,6 +19,9 @@ public:
 	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
 	virtual void SetCanInteract(bool bInteract) override;
+
+	UFUNCTION()
+	void InitializeWidgetAndAddToViewport();
 	// VARIABLES
 	protected:
 	// FUNCTIONS

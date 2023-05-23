@@ -18,6 +18,9 @@ public:
 	AFoodBowl();
 	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
+	UFUNCTION()
+	void InitializeWidgetAndAddToViewport();
+	
 	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES
 protected:

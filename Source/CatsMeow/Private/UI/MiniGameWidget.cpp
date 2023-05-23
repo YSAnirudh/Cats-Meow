@@ -31,8 +31,5 @@ void UMiniGameWidget::OnMiniGameFinish(bool bCatWon, int32 MiniGameNumber)
 			}
 		}
 	}
-	if (IsInViewport())
-	{
-		RemoveFromViewport();
-	}
+	RemoveFromParent();
 }

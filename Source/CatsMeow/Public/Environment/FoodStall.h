@@ -25,6 +25,9 @@ public:
 
 	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
+	UFUNCTION()
+	void InitializeWidgetAndAddToViewport();
+	
 	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES
 	// Flipbooks for Storing Animations of 2D Sprites

@@ -100,8 +100,28 @@ void AMainCatCharacter::BeginPlay()
 
 	LoadPlayerSelectionFromSlot(TEXT("MainSlot"));
 
-	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
-	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
+	if (CatHappinessCurrent > 0)
+	{
+		if (!GetWorld()->GetTimerManager().TimerExists(HappinessHandle))
+		{
+			GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
+		}
+	}
+	if (CatHygieneCurrent > 0)
+	{
+		if (!GetWorld()->GetTimerManager().TimerExists(HygieneHandle))
+		{
+			GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
+		}
+	}
+	if (CatHungerCurrent > 0)
+	{
+		if (!GetWorld()->GetTimerManager().TimerExists(HungerHandle))
+		{
+			GetWorld()->GetTimerManager().SetTimer(HungerHandle, this, &AMainCatCharacter::DecrementHunger, HungerTimerCooldown, true);
+		}
+	}
+	
 	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
 
 	bCanInteractWithDoor = false;

@@ -17,22 +17,15 @@ void ARug::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Rug Mini Game Open!!"));
-		if (!IsValid(MiniGameWidget))
+		
+		bHasPlayedMiniGame = true;
+		bCanInteract = false;
+		if (MainCatCharacter)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("No Widget"));
-			return;
+			MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
+			MainCatCharacter->RemoveInteractableFromSet(this);
 		}
-		if (IsValid(MiniGameWidget) && !MiniGameWidget->IsInViewport())
-		{
-			MiniGameWidget->AddToViewport();
-			bHasPlayedMiniGame = true;
-			bCanInteract = false;
-			if (MainCatCharacter)
-			{
-				MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
-				MainCatCharacter->RemoveInteractableFromSet(this);
-			}
-		}
+		InitializeWidgetAndAddToViewport();
 	} else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
@@ -47,13 +40,11 @@ void ARug::SetCanInteract(bool bInteract)
 	}
 }
 
-void ARug::BeginPlay()
+void ARug::InitializeWidgetAndAddToViewport()
 {
-	Super::BeginPlay();
-
 	if (!MiniGameWidget && MiniGameWidgetClass)
 	{
-		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
+		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body;
 		int32 Texture;
@@ -67,16 +58,37 @@ void ARug::BeginPlay()
 			Body = 0;
 			Texture = 0;
 		}
+		if (IsValid(MiniGameWidget))
+		{
+			MiniGameWidget->CatSelection = Body * 2 + Texture;
+			MiniGameWidget->AddToViewport();
+		}
+	}
+}
+
+void ARug::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!MiniGameWidget && MiniGameWidgetClass)
+	{
+		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
+		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
+		int32 Body;
+		int32 Texture;
 
 		if (CatSaveGame)
 		{
-			int32 Body = CatSaveGame->CatBodyShapeNum;
-			int32 Texture = CatSaveGame->CatTextureNum;
-
-			if (IsValid(MiniGameWidget))
-			{
-				MiniGameWidget->CatSelection = Body * 2 + Texture;
-			}
+			Body = CatSaveGame->CatBodyShapeNum;
+			Texture = CatSaveGame->CatTextureNum;
+		} else
+		{
+			Body = 0;
+			Texture = 0;
+		}
+		if (IsValid(MiniGameWidget))
+		{
+			MiniGameWidget->CatSelection = Body * 2 + Texture;
 		}
 	}
 }

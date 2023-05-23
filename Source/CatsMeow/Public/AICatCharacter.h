@@ -23,6 +23,9 @@ public:
 	FORCEINLINE bool GetCanCharacterInteract() const { return bCanInteract; }
 
 	UFUNCTION()
+	void InitializeWidgetAndAddToViewport();
+
+	UFUNCTION()
 	void OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
