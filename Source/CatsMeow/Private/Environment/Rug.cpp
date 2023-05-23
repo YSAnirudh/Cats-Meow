@@ -26,7 +26,7 @@ void ARug::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 			if (MainCatRef)
 			{
 				bCanInteract = false;
@@ -56,12 +56,16 @@ void ARug::BeginPlay()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
-		int32 Body = CatSaveGame->CatBodyShapeNum;
-		int32 Texture = CatSaveGame->CatTextureNum;
 
-		if (IsValid(MiniGameWidget))
+		if (CatSaveGame)
 		{
-			MiniGameWidget->CatSelection = Body * 2 + Texture;
+			int32 Body = CatSaveGame->CatBodyShapeNum;
+			int32 Texture = CatSaveGame->CatTextureNum;
+
+			if (IsValid(MiniGameWidget))
+			{
+				MiniGameWidget->CatSelection = Body * 2 + Texture;
+			}
 		}
 	}
 }

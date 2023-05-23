@@ -49,7 +49,7 @@ void AAICatCharacter::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 			if (MainCatRef)
 			{
 				bCanInteract = false;
@@ -103,14 +103,17 @@ void AAICatCharacter::BeginPlay()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
-		int32 Body = CatSaveGame->CatBodyShapeNum;
-		int32 Texture = CatSaveGame->CatTextureNum;
-
-		if (IsValid(MiniGameWidget))
+		if (CatSaveGame)
 		{
-			MiniGameWidget->CatSelection = Body * MaxBodyShapes + Texture;
-			MiniGameWidget->AICatSelection = CatBodyShape * MaxBodyShapes + CatTexture;
-			MiniGameWidget->AICatAccessory = CatAccessory;
+			int32 Body = CatSaveGame->CatBodyShapeNum;
+			int32 Texture = CatSaveGame->CatTextureNum;
+
+			if (IsValid(MiniGameWidget))
+			{
+				MiniGameWidget->CatSelection = Body * MaxBodyShapes + Texture;
+				MiniGameWidget->AICatSelection = CatBodyShape * MaxBodyShapes + CatTexture;
+				MiniGameWidget->AICatAccessory = CatAccessory;
+			}
 		}
 	}
 

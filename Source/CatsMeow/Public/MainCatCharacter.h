@@ -55,18 +55,28 @@ public:
 	FORCEINLINE void DecrementHappiness()
 	{
 		CatHappinessCurrent = CatHappinessCurrent - 1 < 0 ? 0 : CatHappinessCurrent - 1;
+		if (CatHappinessCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
+		}
 		OnNotifyPlayer(TEXT("Happiness -1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent + 1 > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+		GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
+		GetWorld()->GetTimerManager().SetTimer(HungerHandle, this, &AMainCatCharacter::DecrementHunger, HungerTimerCooldown, true);
 		OnNotifyPlayer(TEXT("Hunger +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent - 1 < 0 ? 0 : CatHungerCurrent - 1;
+		if (CatHungerCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
+		}
 		OnNotifyPlayer(TEXT("Hunger -1"));
 	}
 	UFUNCTION(BlueprintCallable)
@@ -81,6 +91,10 @@ public:
 	FORCEINLINE void DecrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent - 1 < 0 ? 0 : CatHygieneCurrent - 1;
+		if (CatHygieneCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
+		}
 		OnNotifyPlayer(TEXT("Hygiene -1"));
 	}
 	UFUNCTION()
