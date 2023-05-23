@@ -16,7 +16,7 @@ class CATSMEOW_API AFoodBowl : public ABaseEnvironmentActor
 public:
 	// FUNCTIONS
 	AFoodBowl();
-	virtual void MainCharacterInteractFunction() override;
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
 	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES

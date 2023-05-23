@@ -16,7 +16,7 @@ class CATSMEOW_API ARug : public ABaseEnvironmentActor
 public:
 	// FUNCTIONS
 	ARug();
-	virtual void MainCharacterInteractFunction() override;
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
 	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES

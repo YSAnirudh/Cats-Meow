@@ -75,7 +75,7 @@ void ABaseEnvironmentActor::SetCanInteract(bool bInteract)
 	bCanInteract = false;
 }
 
-void ABaseEnvironmentActor::MainCharacterInteractFunction()
+void ABaseEnvironmentActor::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 }
 
@@ -92,8 +92,12 @@ void ABaseEnvironmentActor::Tick(float DeltaTime)
 void ABaseEnvironmentActor::OnStartInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
+	if (bHasPlayedMiniGame)
+	{
+		return;
+	}
 
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
 	if (MainCatRef)
 	{
 		MainCatRef->AddInteractableToSet(this);
@@ -103,8 +107,12 @@ void ABaseEnvironmentActor::OnStartInteract(UPrimitiveComponent* OverlappedCompo
 void ABaseEnvironmentActor::OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (bHasPlayedMiniGame)
+	{
+		return;
+	}
+	
 	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(OtherActor);
-
 	if (MainCatRef)
 	{
 		MainCatRef->RemoveInteractableFromSet(this);

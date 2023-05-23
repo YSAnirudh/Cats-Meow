@@ -26,9 +26,9 @@ void ABuildingEnvironment::BeginPlay()
 	SetFlipbooks();
 }
 
-void ABuildingEnvironment::MainCharacterInteractFunction()
+void ABuildingEnvironment::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
-	Super::MainCharacterInteractFunction();
+	Super::MainCharacterInteractFunction(MainCatCharacter);
 }
 
 void ABuildingEnvironment::LoadBuildingFlipbooks()

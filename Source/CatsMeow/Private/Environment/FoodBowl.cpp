@@ -11,7 +11,7 @@ AFoodBowl::AFoodBowl()
 	bIsInteractable = true;
 }
 
-void AFoodBowl::MainCharacterInteractFunction()
+void AFoodBowl::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
@@ -25,12 +25,11 @@ void AFoodBowl::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (MainCatRef)
+			bCanInteract = false;
+			if (MainCatCharacter)
 			{
-				bCanInteract = false;
-				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-				MainCatRef->RemoveInteractableFromSet(this);
+				MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
+				MainCatCharacter->RemoveInteractableFromSet(this);
 			}
 		}
 	} else

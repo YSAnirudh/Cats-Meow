@@ -122,7 +122,7 @@ void AMainCatCharacter::OnInteract()
 	 	AAICatCharacter* AICatCharacter = Cast<AAICatCharacter>(InteractableActor);
 		if (AICatCharacter)
 		{
-			AICatCharacter->MainCharacterInteractFunction();
+			AICatCharacter->MainCharacterInteractFunction(this);
 		}
 		else
 		{
@@ -131,11 +131,11 @@ void AMainCatCharacter::OnInteract()
 			{
 				if (bCanInteractWithDoor)
 				{
-					ApartmentDoor->MainCharacterInteractFunction();
+					ApartmentDoor->MainCharacterInteractFunction(this);
 				}
 				else
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Complete Required Minigames to Interact"));
+					OnNotifyPlayer(TEXT("Complete Required Minigames"));
 				}
 			}
 			else
@@ -143,7 +143,7 @@ void AMainCatCharacter::OnInteract()
 				ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(InteractableActor);
 				if (EnvActor)
 				{
-					EnvActor->MainCharacterInteractFunction();
+					EnvActor->MainCharacterInteractFunction(this);
 				}
 			}
 		}

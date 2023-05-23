@@ -23,7 +23,7 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void MainCharacterInteractFunction() override;
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 
 	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES

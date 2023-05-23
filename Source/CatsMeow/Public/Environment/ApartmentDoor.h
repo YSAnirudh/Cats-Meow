@@ -16,7 +16,7 @@ class CATSMEOW_API AApartmentDoor : public ABaseEnvironmentActor
 public:
 	// FUNCTIONS
 	AApartmentDoor();
-	virtual void MainCharacterInteractFunction() override;
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter) override;
 	virtual void SetCanInteract(bool bInteract) override;
 	
 	// VARIABLES

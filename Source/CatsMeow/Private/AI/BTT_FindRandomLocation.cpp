@@ -22,17 +22,22 @@ EBTNodeResult::Type UBTT_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent&
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	const APawn* AIPawn = AIController->GetPawn();
 
-	const FVector Origin = AIPawn->GetActorLocation();
-
-	const UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-	if (NavSystem && NavSystem->GetRandomPointInNavigableRadius(Origin, SearchRadius, Location))
+	if (AIPawn)
 	{
-		AIController->GetBlackboardComponent()->SetValueAsVector(BlackboardKey.SelectedKeyName, Location.Location);
+		const FVector Origin = AIPawn->GetActorLocation();
+		const UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+		if (NavSystem && NavSystem->GetRandomPointInNavigableRadius(Origin, SearchRadius, Location))
+		{
+			if (AIController)
+			{
+				AIController->GetBlackboardComponent()->SetValueAsVector(BlackboardKey.SelectedKeyName, Location.Location);
+			}
+		}
 	}
-
-	DrawDebugSphere(GetWorld(),
-		Location.Location,
-		20.f, 8, FColor::Red, false, 2.f, 0, 2);
+	
+	// DrawDebugSphere(GetWorld(),
+	// 	Location.Location,
+	// 	20.f, 8, FColor::Red, false, 2.f, 0, 2);
 	
 	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;

@@ -8,10 +8,10 @@
 
 void UMiniGameWidget::OnMiniGameFinish(bool bCatWon, int32 MiniGameNumber)
 {
-	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (MainCatRef)
 	{
-		MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		MainCatRef->EnableInput(MainCatRef->GetLocalViewingPlayerController());
 		MainCatRef->IncrementMiniGameCount();
 		if (bCatWon)
 		{

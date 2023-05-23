@@ -9,14 +9,13 @@ AApartmentDoor::AApartmentDoor()
 {
 }
 
-void AApartmentDoor::MainCharacterInteractFunction()
+void AApartmentDoor::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
-	AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!MainCatRef)
+	if (!MainCatCharacter)
 	{
 		return;
 	}	
-	if (MainCatRef->GetCurrentMap() == -1)
+	if (MainCatCharacter->GetCurrentMap() == -1)
 	{
 		const int32 MapToGo = FMath::RandRange(0, 3);
 
@@ -24,23 +23,23 @@ void AApartmentDoor::MainCharacterInteractFunction()
 		switch(MapToGo)
 		{
 		case 0:
-			MainCatRef->SetCurrentMap(0);
-			MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
+			MainCatCharacter->SetCurrentMap(0);
+			MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 			UGameplayStatics::OpenLevel(GetWorld(), *MapName);
 			break;
 		case 1:
-			MainCatRef->SetCurrentMap(1);
-			MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
+			MainCatCharacter->SetCurrentMap(1);
+			MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 			UGameplayStatics::OpenLevel(GetWorld(), *MapName);
 			break;
 		case 2:
-			MainCatRef->SetCurrentMap(2);
-			MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
+			MainCatCharacter->SetCurrentMap(2);
+			MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 			UGameplayStatics::OpenLevel(GetWorld(), *MapName);
 			break;
 		case 3:
-			MainCatRef->SetCurrentMap(3);
-			MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
+			MainCatCharacter->SetCurrentMap(3);
+			MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 			UGameplayStatics::OpenLevel(GetWorld(), *MapName);
 			break;
 		default:
@@ -50,8 +49,8 @@ void AApartmentDoor::MainCharacterInteractFunction()
 	}
 	else
 	{
-		MainCatRef->SetCurrentMap(-1);
-		MainCatRef->SavePlayerSelectionToSlot(TEXT("MainSlot"));
+		MainCatCharacter->SetCurrentMap(-1);
+		MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("CatApartment"));
 	}
 }

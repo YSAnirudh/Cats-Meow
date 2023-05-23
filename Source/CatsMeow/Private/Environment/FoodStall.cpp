@@ -24,7 +24,7 @@ void AFoodStall::BeginPlay()
 	SetFlipbooks();
 }
 
-void AFoodStall::MainCharacterInteractFunction()
+void AFoodStall::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
@@ -38,12 +38,11 @@ void AFoodStall::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (MainCatRef)
+			bCanInteract = false;
+			if (MainCatCharacter)
 			{
-				bCanInteract = false;
-				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-				MainCatRef->RemoveInteractableFromSet(this);
+				MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
+				MainCatCharacter->RemoveInteractableFromSet(this);
 			}
 		}
 	} else

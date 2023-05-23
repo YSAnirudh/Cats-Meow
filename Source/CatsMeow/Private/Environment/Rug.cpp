@@ -12,7 +12,7 @@ ARug::ARug()
 	// HoverWidget = CreateDefaultSubobject<UUserWidget>(TEXT("HoverWidget"));
 }
 
-void ARug::MainCharacterInteractFunction()
+void ARug::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
@@ -26,12 +26,11 @@ void ARug::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (MainCatRef)
+			bCanInteract = false;
+			if (MainCatCharacter)
 			{
-				bCanInteract = false;
-				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-				MainCatRef->RemoveInteractableFromSet(this);
+				MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
+				MainCatCharacter->RemoveInteractableFromSet(this);
 			}
 		}
 	} else
@@ -56,6 +55,18 @@ void ARug::BeginPlay()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
+		int32 Body;
+		int32 Texture;
+
+		if (CatSaveGame)
+		{
+			Body = CatSaveGame->CatBodyShapeNum;
+			Texture = CatSaveGame->CatTextureNum;
+		} else
+		{
+			Body = 0;
+			Texture = 0;
+		}
 
 		if (CatSaveGame)
 		{

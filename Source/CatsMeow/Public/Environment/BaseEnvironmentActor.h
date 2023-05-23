@@ -34,7 +34,7 @@ public:
 	virtual void SetCanInteract(bool bInteract);
 	
 	UFUNCTION()
-	virtual void MainCharacterInteractFunction();
+	virtual void MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter);
 	
 	// VARIABLES
 protected:

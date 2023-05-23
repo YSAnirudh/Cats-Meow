@@ -27,7 +27,7 @@ public:
 	UFUNCTION()
 	void OnEndInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	UFUNCTION()
-	virtual void MainCharacterInteractFunction();
+	virtual void MainCharacterInteractFunction(class AMainCatCharacter* MainCatCharacter);
 	UFUNCTION()
 	FORCEINLINE int32 GetCanInteract() const { return bCanInteract; }
 	UFUNCTION()

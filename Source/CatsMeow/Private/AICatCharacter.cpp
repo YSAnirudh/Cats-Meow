@@ -31,7 +31,7 @@ void AAICatCharacter::Tick(float DeltaSeconds)
 	
 }
 
-void AAICatCharacter::MainCharacterInteractFunction()
+void AAICatCharacter::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
 	
@@ -49,12 +49,11 @@ void AAICatCharacter::MainCharacterInteractFunction()
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (MainCatRef)
+			bCanInteract = false;
+			if (MainCatCharacter)
 			{
-				bCanInteract = false;
-				MainCatRef->DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-				MainCatRef->RemoveInteractableFromSet(this);
+				MainCatCharacter->DisableInput(MainCatCharacter->GetLocalViewingPlayerController());
+				MainCatCharacter->RemoveInteractableFromSet(this);
 			}
 		}
 	} else
@@ -103,7 +102,17 @@ void AAICatCharacter::BeginPlay()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass, TEXT("PettingGameWidget"));
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
-		if (CatSaveGame)
+		int32 Body;
+		int32 Texture;
+		if (CatSaveGame) {
+			Body = CatSaveGame->CatBodyShapeNum;
+			Texture = CatSaveGame->CatTextureNum;
+		} else {
+			Body = 0;
+			Texture = 0;
+		}
+
+		if (IsValid(MiniGameWidget))
 		{
 			int32 Body = CatSaveGame->CatBodyShapeNum;
 			int32 Texture = CatSaveGame->CatTextureNum;
@@ -117,18 +126,8 @@ void AAICatCharacter::BeginPlay()
 		}
 	}
 
-	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);
-	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AAICatCharacter::OnEndInteract);
-	
-	PatrolPoint = FVector(-610.f, 0.f, 0.f);
-	const FVector WorldPatrolPoint = UKismetMathLibrary::TransformLocation(
-		GetActorTransform(),
-		PatrolPoint
-	);
-
-	DrawDebugPoint(
-		GetWorld(),
-		WorldPatrolPoint,
-		3.f, FColor::Black, true
-	);
+	if (InteractionSphere) {
+		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);
+		InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AAICatCharacter::OnEndInteract);
+	}
 }
