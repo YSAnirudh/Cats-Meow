@@ -43,7 +43,7 @@ void ABuildingEnvironment::LoadBuildingFlipbooks()
 				FString("'/Game/Assets/Outside/Flipbooks/Buildings/FB_Building_") +
 					TierStyleValue + FString(".FB_Building_") + TierStyleValue + FString("'");
 
-			BuildingFlipbooks[i * NumBuildingTiers + j] = LoadObject<UPaperFlipbook>(
+			BuildingFlipbooks[i * NumBuildingAssets + j] = LoadObject<UPaperFlipbook>(
 				nullptr,
 				*(AnimationText),
 				nullptr,
@@ -69,11 +69,11 @@ void ABuildingEnvironment::InitializeFlipbooks()
 void ABuildingEnvironment::SetFlipbooks()
 {
 	int32 StyleNum = FMath::RandRange(0, NumBuildingAssets-1);
-	GetSprite()->SetFlipbook(BuildingFlipbooks[StyleNum]);
+	GetSprite()->SetFlipbook(BuildingFlipbooks[StyleNum].Get());
 	
 	StyleNum = FMath::RandRange(0, NumBuildingAssets-1);
-	Tier1Sprite->SetFlipbook(BuildingFlipbooks[NumBuildingTiers + StyleNum]);
+	Tier1Sprite->SetFlipbook(BuildingFlipbooks[NumBuildingAssets + StyleNum].Get());
 	
 	StyleNum = FMath::RandRange(0, NumBuildingAssets-1);
-	Tier2Sprite->SetFlipbook(BuildingFlipbooks[(2 * NumBuildingTiers) + StyleNum]);
+	Tier2Sprite->SetFlipbook(BuildingFlipbooks[(2 * NumBuildingAssets) + StyleNum].Get());
 }

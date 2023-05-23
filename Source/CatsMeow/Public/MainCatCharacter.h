@@ -35,39 +35,67 @@ public:
 	UFUNCTION()
 	void OnInteract();
 
+	UFUNCTION(BlueprintCallable)
+	void IncrementMiniGameCount();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnNotifyPlayer(const FString& Notification);
+
 	// INLINE FUNCTIONS
 	// INCREMENT AND DECREMENT STATS
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHappiness()
 	{
 		CatHappinessCurrent = CatHappinessCurrent + 1 > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
-		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
+		GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
+		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
+		OnNotifyPlayer(TEXT("Happiness +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHappiness()
 	{
 		CatHappinessCurrent = CatHappinessCurrent - 1 < 0 ? 0 : CatHappinessCurrent - 1;
+		if (CatHappinessCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
+		}
+		OnNotifyPlayer(TEXT("Happiness -1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent + 1 > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
+		GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
+		GetWorld()->GetTimerManager().SetTimer(HungerHandle, this, &AMainCatCharacter::DecrementHunger, HungerTimerCooldown, true);
+		OnNotifyPlayer(TEXT("Hunger +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHunger()
 	{
 		CatHungerCurrent = CatHungerCurrent - 1 < 0 ? 0 : CatHungerCurrent - 1;
+		if (CatHungerCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
+		}
+		OnNotifyPlayer(TEXT("Hunger -1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent + 1 > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
-		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
+		GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
+		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
+		OnNotifyPlayer(TEXT("Hygiene +1"));
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHygiene()
 	{
 		CatHygieneCurrent = CatHygieneCurrent - 1 < 0 ? 0 : CatHygieneCurrent - 1;
+		if (CatHygieneCurrent == 0)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
+		}
+		OnNotifyPlayer(TEXT("Hygiene -1"));
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }
@@ -131,7 +159,13 @@ private:
 	FTimerHandle HappinessHandle;
 	FTimerHandle HygieneHandle;
 	FTimerHandle HungerHandle;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	TMap<int32, int32> MinimumMiniGamesPerMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
+	int32 CurrentMiniGamesPlayed = 0;
+	bool bCanInteractWithDoor = false;
 protected:
 	// FUNCTIONS
 	virtual void BeginPlay() override;

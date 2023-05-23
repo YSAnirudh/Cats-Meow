@@ -17,7 +17,8 @@ public:
 	// FUNCTIONS
 	ARug();
 	virtual void MainCharacterInteractFunction() override;
-	
+
+	virtual void SetCanInteract(bool bInteract) override;
 	// VARIABLES
 	protected:
 	// FUNCTIONS
@@ -27,8 +28,6 @@ public:
 	// VARIABLES
 	private:
 	// FUNCTIONS
-	UFUNCTION()
-	void OnMiniGameFinish(bool bCatWon);
 
 	// VARIABLES
 };

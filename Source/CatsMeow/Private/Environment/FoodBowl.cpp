@@ -8,6 +8,7 @@
 
 AFoodBowl::AFoodBowl()
 {
+	bIsInteractable = true;
 }
 
 void AFoodBowl::MainCharacterInteractFunction()
@@ -15,11 +16,16 @@ void AFoodBowl::MainCharacterInteractFunction()
 	if (bIsInteractable && !bHasPlayedMiniGame)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Food Bowl Mini Game Open!!"));
-		if (MiniGameWidget && !MiniGameWidget->IsInViewport())
+		if (!IsValid(MiniGameWidget))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Widget"));
+			return;
+		}
+		if (IsValid(MiniGameWidget) && !MiniGameWidget->IsInViewport())
 		{
 			MiniGameWidget->AddToViewport();
 			bHasPlayedMiniGame = true;
-			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			AMainCatCharacter* MainCatRef = Cast<AMainCatCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 			if (MainCatRef)
 			{
 				bCanInteract = false;

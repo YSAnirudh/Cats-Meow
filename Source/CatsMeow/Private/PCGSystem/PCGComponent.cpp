@@ -68,7 +68,7 @@ void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 							FColor PointColor = FColor(((float)SpawnRegion / ActorData.SpawnRegions.Num() - 1) * 256);
 							FVector SpawnPoint = FVector(XPos, YPos, VolumeBoundsMax.Z);
 							DrawDebugPoint(
-								GetWorld(), SpawnPoint, 10, PointColor, !bEveryTick, -1, 0
+								GetWorld(), SpawnPoint, 5, PointColor, !bEveryTick, -1, 0
 							);
 						}
 					}
@@ -173,20 +173,44 @@ void UPCGComponent::CreateGrid()
 				
 				if (bDebugRun)
 				{
-					uint8 Red = static_cast<uint8>((i / (float)GridDivisionsX) * 256); 
-					uint8 Blue = static_cast<uint8>((j / (float)GridDivisionsY) * 256); 
-					FColor BoxColor = FColor(Red, 0, Blue);
 					DrawDebugBox(
 						GetWorld(),
 						FVector(XPos, YPos, VolumeBoundsMax.Z),
 						FVector(XExtent, YExtent, 2.0f),
-						BoxColor, !bEveryTick, -1, 0, 1
+						FColor::Green, !bEveryTick, -1, 0, 1
 					);
-					DrawDebugPoint(
-						GetWorld(), SpawnPoint, 3, FColor::Blue, !bEveryTick, -1, 0
-					);
+					// DrawDebugPoint(
+					// 	GetWorld(), SpawnPoint, 3, FColor::Blue, !bEveryTick, -1, 0
+					// );
 				}
 
+			}
+		}
+
+		if (bDebugRun)
+		{
+			for (int i = 0; i < GridDivisionsX; i++)
+			{
+				const float XPos = VolumeBoundsMin.X + (GridSizeX * i) + GridSizeX / 2;
+				const float YPos = VolumeBoundsMin.Y;
+				
+				uint8 Red = FMath::Floor(static_cast<uint8>((i / (float)GridDivisionsX) * 256)); 
+				FColor BoxColor = FColor(Red, 0, 0);
+				DrawDebugPoint(
+					GetWorld(), FVector(XPos, YPos, VolumeBoundsMax.Z), 15, BoxColor, !bEveryTick, -1, 0
+				);
+			}
+
+			for (int i = 0; i < GridDivisionsY; i++)
+			{
+				const float YPos = VolumeBoundsMin.Y + (GridSizeY * i) + GridSizeY / 2;
+				const float XPos = VolumeBoundsMin.X;
+				
+				uint8 Red = FMath::Floor(static_cast<uint8>((i / (float)GridDivisionsY) * 256)); 
+				FColor BoxColor = FColor(0, Red, 0);
+				DrawDebugPoint(
+					GetWorld(), FVector(XPos, YPos, VolumeBoundsMax.Z), 15, BoxColor, !bEveryTick, -1, 0
+				);
 			}
 		}
 	}

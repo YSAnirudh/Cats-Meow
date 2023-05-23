@@ -12,6 +12,7 @@ void UMiniGameWidget::OnMiniGameFinish(bool bCatWon, int32 MiniGameNumber)
 	if (MainCatRef)
 	{
 		MainCatRef->EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		MainCatRef->IncrementMiniGameCount();
 		if (bCatWon)
 		{
 			switch (MiniGameNumber)

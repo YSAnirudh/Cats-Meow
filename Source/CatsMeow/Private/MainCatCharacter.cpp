@@ -5,6 +5,7 @@
 
 #include "AICatCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Environment/ApartmentDoor.h"
 #include "Environment/BaseEnvironmentActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -97,13 +98,14 @@ void AMainCatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Character in Level: %s"), *GetWorld()->GetCurrentLevel()->GetName());
-	
 	LoadPlayerSelectionFromSlot(TEXT("MainSlot"));
 
-	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown);
-	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown);
+	GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
+	GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
 	//SavePlayerSelectionToSlot(TEXT("CustomToInit"));
+
+	bCanInteractWithDoor = false;
+	CurrentMiniGamesPlayed = 0;
 }
 
 void AMainCatCharacter::Tick(float DeltaSeconds)
@@ -124,13 +126,42 @@ void AMainCatCharacter::OnInteract()
 		}
 		else
 		{
-			ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(InteractableActor);
-			if (EnvActor)
+			AApartmentDoor* ApartmentDoor = Cast<AApartmentDoor>(InteractableActor);
+			if (ApartmentDoor)
 			{
-				EnvActor->MainCharacterInteractFunction();
+				if (bCanInteractWithDoor)
+				{
+					ApartmentDoor->MainCharacterInteractFunction();
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Complete Required Minigames to Interact"));
+				}
+			}
+			else
+			{
+				ABaseEnvironmentActor* EnvActor = Cast<ABaseEnvironmentActor>(InteractableActor);
+				if (EnvActor)
+				{
+					EnvActor->MainCharacterInteractFunction();
+				}
 			}
 		}
 	}
+}
+
+void AMainCatCharacter::IncrementMiniGameCount()
+{
+	CurrentMiniGamesPlayed++;
+
+	if (CurrentMiniGamesPlayed >= MinimumMiniGamesPerMap[MapNumber])
+	{
+		bCanInteractWithDoor = true;
+	}
+}
+
+void AMainCatCharacter::OnNotifyPlayer_Implementation(const FString& Notification)
+{
 }
 
 AActor* AMainCatCharacter::FindInteractable()
