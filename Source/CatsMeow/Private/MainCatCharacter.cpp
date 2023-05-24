@@ -155,7 +155,7 @@ void AMainCatCharacter::OnInteract()
 				}
 				else
 				{
-					OnNotifyPlayer(TEXT("Complete Required Minigames"));
+					OnNotifyPlayer(TEXT("Door Locked"));
 				}
 			}
 			else
@@ -176,6 +176,7 @@ void AMainCatCharacter::IncrementMiniGameCount()
 
 	if (CurrentMiniGamesPlayed >= MinimumMiniGamesPerMap[MapNumber])
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%d"), MinimumMiniGamesPerMap[MapNumber]);
 		bCanInteractWithDoor = true;
 	}
 }

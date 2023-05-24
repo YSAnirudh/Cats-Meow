@@ -49,7 +49,14 @@ public:
 		CatHappinessCurrent = CatHappinessCurrent + 1 > CatHappinessMax ? CatHappinessMax : CatHappinessCurrent + 1;
 		GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
 		GetWorld()->GetTimerManager().SetTimer(HappinessHandle, this, &AMainCatCharacter::DecrementHappiness, HappinessTimerCooldown, true);
-		OnNotifyPlayer(TEXT("Happiness +1"));
+		if (CatHappinessCurrent >= CatHappinessMax)
+		{
+			OnNotifyPlayer(TEXT("Happiness MAX"));
+		}
+		else
+		{
+			OnNotifyPlayer(TEXT("Happiness +1"));
+		}
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHappiness()
@@ -58,8 +65,12 @@ public:
 		if (CatHappinessCurrent == 0)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(HappinessHandle);
+			OnNotifyPlayer(TEXT("NO Happiness"));
 		}
-		OnNotifyPlayer(TEXT("Happiness -1"));
+		else
+		{
+			OnNotifyPlayer(TEXT("Happiness -1"));
+		}
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHunger()
@@ -67,7 +78,14 @@ public:
 		CatHungerCurrent = CatHungerCurrent + 1 > CatHungerMax ? CatHungerMax : CatHungerCurrent + 1;
 		GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
 		GetWorld()->GetTimerManager().SetTimer(HungerHandle, this, &AMainCatCharacter::DecrementHunger, HungerTimerCooldown, true);
-		OnNotifyPlayer(TEXT("Hunger +1"));
+		if (CatHungerCurrent >= CatHungerMax)
+		{
+			OnNotifyPlayer(TEXT("Belly FULL"));
+		}
+		else
+		{
+			OnNotifyPlayer(TEXT("Hunger +1"));
+		}
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHunger()
@@ -76,8 +94,12 @@ public:
 		if (CatHungerCurrent == 0)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(HungerHandle);
+			OnNotifyPlayer(TEXT("Belly EMPTY"));
 		}
-		OnNotifyPlayer(TEXT("Hunger -1"));
+		else
+		{
+			OnNotifyPlayer(TEXT("Hunger -1"));
+		}
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void IncrementHygiene()
@@ -85,7 +107,15 @@ public:
 		CatHygieneCurrent = CatHygieneCurrent + 1 > CatHygieneMax ? CatHygieneMax : CatHygieneCurrent + 1;
 		GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
 		GetWorld()->GetTimerManager().SetTimer(HygieneHandle, this, &AMainCatCharacter::DecrementHygiene, HygieneTimerCooldown, true);
-		OnNotifyPlayer(TEXT("Hygiene +1"));
+
+		if (CatHygieneCurrent >= CatHygieneMax)
+		{
+			OnNotifyPlayer(TEXT("Hygiene MAX"));
+		}
+		else
+		{
+			OnNotifyPlayer(TEXT("Hygiene +1"));
+		}
 	}
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void DecrementHygiene()
@@ -94,8 +124,12 @@ public:
 		if (CatHygieneCurrent == 0)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(HygieneHandle);
+			OnNotifyPlayer(TEXT("NO Hygiene"));
 		}
-		OnNotifyPlayer(TEXT("Hygiene -1"));
+		else
+		{
+			OnNotifyPlayer(TEXT("Hygiene -1"));
+		}
 	}
 	UFUNCTION()
 	FORCEINLINE class UCameraComponent* GetPlayerCameraComponent() const { return CameraComponent; }

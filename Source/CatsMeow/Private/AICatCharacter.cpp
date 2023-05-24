@@ -35,7 +35,7 @@ void AAICatCharacter::MainCharacterInteractFunction(AMainCatCharacter* MainCatCh
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
 	
-	if (!bHasPlayedMiniGame)
+	if (!bHasPlayedMiniGame && MiniGameWidgetClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NPC Mini Game Open!!"));
 		
@@ -58,6 +58,10 @@ void AAICatCharacter::InitializeWidgetAndAddToViewport()
 	if (!MiniGameWidget && MiniGameWidgetClass)
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
+		if (!MiniGameWidget) {
+			UE_LOG(LogTemp, Warning, TEXT("Couldn't create Mini Game Widget"));
+			return;
+		}
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body;
 		int32 Texture;
