@@ -16,8 +16,6 @@ void AFoodBowl::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacte
 {
 	if (bIsInteractable && !bHasPlayedMiniGame && MiniGameWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Food Bowl Mini Game Open!!"));
-
 		bHasPlayedMiniGame = true;
 		bCanInteract = false;
 		if (MainCatCharacter)
@@ -26,9 +24,6 @@ void AFoodBowl::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacte
 			MainCatCharacter->RemoveInteractableFromSet(this);
 		}
 		InitializeWidgetAndAddToViewport();
-	} else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
 	}
 }
 
@@ -38,25 +33,28 @@ void AFoodBowl::InitializeWidgetAndAddToViewport()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
 		if (!MiniGameWidget) {
-			UE_LOG(LogTemp, Warning, TEXT("Couldn't create Mini Game Widget"));
 		    return;
 		}
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
 		int32 Body;
 		int32 Texture;
+		int32 Accessory;
 
 		if (CatSaveGame)
 		{
 			Body = CatSaveGame->CatBodyShapeNum;
 			Texture = CatSaveGame->CatTextureNum;
+			Accessory = CatSaveGame->CatAccessoryNum;
 		} else
 		{
 			Body = 0;
 			Texture = 0;
+			Accessory = 0;
 		}
 		if (IsValid(MiniGameWidget))
 		{
 			MiniGameWidget->CatSelection = Body * 2 + Texture;
+			MiniGameWidget->CatAccessory = Accessory;
 			MiniGameWidget->AddToViewport();
 		}
 	}

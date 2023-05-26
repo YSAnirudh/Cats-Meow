@@ -35,10 +35,6 @@ EBTNodeResult::Type UBTT_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent&
 		}
 	}
 	
-	// DrawDebugSphere(GetWorld(),
-	// 	Location.Location,
-	// 	20.f, 8, FColor::Red, false, 2.f, 0, 2);
-	
 	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
 }

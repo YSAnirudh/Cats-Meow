@@ -200,6 +200,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CatStats", meta=(AllowPrivateAccess = "true"))
 	int32 CurrentMiniGamesPlayed = 0;
 	bool bCanInteractWithDoor = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CatSound", meta=(AllowPrivateAccess = "true"))
+	USoundWave* InteractionSound = nullptr;
 protected:
 	// FUNCTIONS
 	virtual void BeginPlay() override;

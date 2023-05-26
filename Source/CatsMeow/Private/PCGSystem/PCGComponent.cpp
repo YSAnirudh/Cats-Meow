@@ -3,6 +3,7 @@
 
 #include "PCGSystem/PCGComponent.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "PCGSystem/PCGVolume.h"
 
 // Sets default values for this component's properties
@@ -28,6 +29,8 @@ void UPCGComponent::BeginPlay()
 	ParentVolumeRef = Cast<APCGVolume>(GetOwner());
 	CreateGrid();
 	ProcedurallyGenerateActors(0);
+
+	
 }
 
 void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
@@ -96,9 +99,6 @@ void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 				
 				const int32 SpawnInd = Indices.Array()[FMath::RandRange(0, Indices.Num()-1)];
 
-				// UE_LOG(LogTemp, Warning, TEXT("Actor: %s | ActorNo: %d | Position: %d"),
-				// 	*ActorData.SpawnActorType->GetName(), i, SpawnInd);
-
 				ActorData.SpawnIndices.Add(SpawnInd);
 				SpawnedIndices.Add(SpawnInd);
 				Indices.Remove(SpawnInd);
@@ -106,7 +106,6 @@ void UPCGComponent::ProcedurallyGenerateActors(int32 MapIndex)
 		}
 		SpawnActorsAtPoints(ActorData);
 	}
-	
 }
 
 void UPCGComponent::SpawnActorsAtPoints(const FProceduralVolumeSpawnData& ActorData)

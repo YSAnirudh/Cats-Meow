@@ -16,8 +16,6 @@ void ARug::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
 	if (bIsInteractable && !bHasPlayedMiniGame && MiniGameWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Rug Mini Game Open!!"));
-		
 		bHasPlayedMiniGame = true;
 		bCanInteract = false;
 		if (MainCatCharacter)
@@ -26,9 +24,6 @@ void ARug::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 			MainCatCharacter->RemoveInteractableFromSet(this);
 		}
 		InitializeWidgetAndAddToViewport();
-	} else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
 	}
 }
 
@@ -46,7 +41,6 @@ void ARug::InitializeWidgetAndAddToViewport()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
 		if (!MiniGameWidget) {
-			UE_LOG(LogTemp, Warning, TEXT("Couldn't create Mini Game Widget"));
 			return;
 		}
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));

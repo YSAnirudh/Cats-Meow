@@ -133,12 +133,21 @@ void AMainCatCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	AlignCharacterToCamera();
 	HandleInteractionAbility();
+
+	if (MinimumMiniGamesPerMap[MapNumber] == 0)
+	{
+		bCanInteractWithDoor = true;
+	}
 }
 
 void AMainCatCharacter::OnInteract()
 {
 	if (InteractableActor)
 	{
+		if (InteractionSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), InteractionSound);
+		}
 	 	AAICatCharacter* AICatCharacter = Cast<AAICatCharacter>(InteractableActor);
 		if (AICatCharacter)
 		{
@@ -176,7 +185,6 @@ void AMainCatCharacter::IncrementMiniGameCount()
 
 	if (CurrentMiniGamesPlayed >= MinimumMiniGamesPerMap[MapNumber])
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%d"), MinimumMiniGamesPerMap[MapNumber]);
 		bCanInteractWithDoor = true;
 	}
 }
@@ -297,7 +305,6 @@ void AMainCatCharacter::LoadPlayerSelectionFromSlot(FString SlotName)
 		CatHungerCurrent = GameDataInstance->HungerCurrent;
 		CatHygieneCurrent = GameDataInstance->HygieneCurrent;
 		MapNumber = GameDataInstance->MapNumber;
-		//UE_LOG(LogTemp, Warning, TEXT("Accessory: %d"), GameDataInstance->CatAccessoryNum);
 	}
 }
 
@@ -380,7 +387,6 @@ void AMainCatCharacter::AlignCharacterToCamera()
 void AMainCatCharacter::ClampCameraPitch() const
 {
 	const FRotator SpringArmRotation = SpringArmComponent->GetRelativeRotation();
-	//UE_LOG(LogTemp, Warning, TEXT("SpringArmRotation.Pitch: %f"), SpringArmRotation.Pitch);
 	if (SpringArmRotation.Pitch < -CameraPitchMax)
 	{
 		

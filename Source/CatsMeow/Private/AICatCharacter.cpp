@@ -19,10 +19,6 @@ AAICatCharacter::AAICatCharacter()
 	InteractionSphere->SetupAttachment(RootComponent);
 	InteractionSphere->SetSphereRadius(100.0f);
 	InteractionSphere->SetCollisionProfileName(TEXT("Trigger"));
-
-	CatBodyShape = FMath::RandRange(0, MaxBodyShapes-1);
-	CatTexture = FMath::RandRange(0, MaxTextures-1);
-	CatAccessory = FMath::RandRange(0, MaxAccessories-1);
 }
 
 void AAICatCharacter::Tick(float DeltaSeconds)
@@ -33,12 +29,8 @@ void AAICatCharacter::Tick(float DeltaSeconds)
 
 void AAICatCharacter::MainCharacterInteractFunction(AMainCatCharacter* MainCatCharacter)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Interacted with EnvironmentActor"));
-	
 	if (!bHasPlayedMiniGame && MiniGameWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NPC Mini Game Open!!"));
-		
 		bHasPlayedMiniGame = true;
 		bCanInteract = false;
 		if (MainCatCharacter)
@@ -47,9 +39,6 @@ void AAICatCharacter::MainCharacterInteractFunction(AMainCatCharacter* MainCatCh
 			MainCatCharacter->RemoveInteractableFromSet(this);
 		}
 		InitializeWidgetAndAddToViewport();
-	} else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Already Played!!"));
 	}
 }
 
@@ -59,7 +48,6 @@ void AAICatCharacter::InitializeWidgetAndAddToViewport()
 	{
 		MiniGameWidget = CreateWidget<UMiniGameWidget>(GetWorld(), MiniGameWidgetClass);
 		if (!MiniGameWidget) {
-			UE_LOG(LogTemp, Warning, TEXT("Couldn't create Mini Game Widget"));
 			return;
 		}
 		UCatSaveGame* CatSaveGame = Cast<UCatSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("MainSlot"), 0));
@@ -117,6 +105,10 @@ void AAICatCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	bHasPlayedMiniGame = false;
+
+	CatBodyShape = FMath::RandRange(0, MaxBodyShapes-1);
+	CatTexture = FMath::RandRange(0, MaxTextures-1);
+	CatAccessory = FMath::RandRange(0, MaxAccessories-1);
 
 	if (InteractionSphere) {
 		InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AAICatCharacter::OnStartInteract);

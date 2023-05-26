@@ -17,6 +17,7 @@ void AApartmentDoor::MainCharacterInteractFunction(AMainCatCharacter* MainCatCha
 	}	
 	if (MainCatCharacter->GetCurrentMap() == -1)
 	{
+		UKismetSystemLibrary::CollectGarbage();
 		const int32 MapToGo = FMath::RandRange(0, 3);
 
 		const FString MapName = FString("MapGeneration") + FString::FromInt(MapToGo + 1);
@@ -45,10 +46,10 @@ void AApartmentDoor::MainCharacterInteractFunction(AMainCatCharacter* MainCatCha
 		default:
 			break;
 		}
-		
 	}
 	else
 	{
+		UKismetSystemLibrary::CollectGarbage();
 		MainCatCharacter->SetCurrentMap(-1);
 		MainCatCharacter->SavePlayerSelectionToSlot(TEXT("MainSlot"));
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("CatApartment"));

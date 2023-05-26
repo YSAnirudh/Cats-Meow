@@ -24,6 +24,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Result")
 	int32 CatSelection = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Result")
+	int32 CatAccessory = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Result")
 	int32 AICatSelection = 0;

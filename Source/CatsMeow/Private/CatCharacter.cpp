@@ -430,7 +430,6 @@ bool ACatCharacter::CheckIndex(int32 BodyShapeNo, int32 TextureNo) const
 {
 	if (TextureNo < 0 || TextureNo >= MaxTextures || BodyShapeNo < 0 || BodyShapeNo >= MaxBodyShapes)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid Texture/Body Shape Number"));
 		return false;
 	}
 	return true;
@@ -440,7 +439,6 @@ bool ACatCharacter::CheckAccessoryNumber(int32 AccessoryNo) const
 {
 	if (AccessoryNo < 0 || AccessoryNo >= MaxAccessories)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid Accessory Number"));
 		return false;
 	}
 	return true;
